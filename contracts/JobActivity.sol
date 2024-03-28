@@ -6,11 +6,15 @@ contract JobActivity {
         address applicantAddress;
         string completedFormLink;
         uint score;
-        string feedback;
     }
 
     address public employer;
-    string private questionnaireLink;
+    mapping(address => string) private questionnaireLinks;   // Individual questionnaire links
+    mapping(address => string) private interviewLinks;       // Individual interview links
+    mapping(address => string) private publicKeyMapping;     // Mapping to store public keys
+    mapping(address => string) private questionFeedbacks;    // Mapping for questionnaire feedbacks
+    mapping(address => string) private interviewFeedbacks;   // Mapping for interview feedbacks
+    mapping(address => string) private symmetricKeyMapping;   // Mapping for interview feedbacks
     Applicant[] private testedApplicants;
     mapping (address => bool) private applicantsWhoHaveAttempted;
     mapping(address => uint) private applicantIndex;
@@ -18,8 +22,11 @@ contract JobActivity {
     uint private passScore = 0;
 
     event ShortlistedApplicantAdded(address applicant);
-    event QuestionnaireLinkSet(string link);
-    event AssessmentCompleted(address applicant, string link, uint score, string feedback);
+    event QuestionnaireLinkSet(address applicant, string qlink);
+    event InterviewLinkSet(address applicant, string ilink);
+    event AssessmentCompleted(address applicant, string link, uint score, string questionFeedback);
+    event SymmetricKeySet(address applicant, string key);
+    event PublicKeySet(address applicant, string key);
 
     modifier onlyEmployer(){
         require(msg.sender == employer);
@@ -38,37 +45,77 @@ contract JobActivity {
         _;
     }
 
-    function JobActivity() public {
+    function JobActivityv2() public {
         employer = msg.sender;
     }
 
-    function addShortlistedApplicant(address applicantAddress) public onlyEmployer {
-        shortlistedApplicants.push(applicantAddress);
-        ShortlistedApplicantAdded(applicantAddress);
+    function addShortlistedApplicant(address _applicantAddress, string _publicKey) public onlyEmployer {
+        shortlistedApplicants.push(_applicantAddress);
+        publicKeyMapping[_applicantAddress] = _publicKey;
+        ShortlistedApplicantAdded(_applicantAddress);
     }
 
     function getShortlistedApplicants() public view onlyEmployer returns (address[]) {
         return shortlistedApplicants;
     }
 
-    function setQuestionnaireLink(string _questionnaireLink) public onlyEmployer {
-        questionnaireLink = _questionnaireLink;
-        QuestionnaireLinkSet(_questionnaireLink);
+    function setQuestionnaireLink(address _applicantAddress, string _questionnaireLink) public onlyEmployer {
+        questionnaireLinks[_applicantAddress] = _questionnaireLink;
+        QuestionnaireLinkSet(_applicantAddress, _questionnaireLink);
+    }
+
+    function setSymmetricKey(address _applicantAddress, string _symmetricKey) public onlyEmployer {
+        symmetricKeyMapping[_applicantAddress] = _symmetricKey;
+        SymmetricKeySet(_applicantAddress, _symmetricKey);
+    }
+
+    function setPublicKey(string _publicKey) public onlyShortlistedApplicant {
+        publicKeyMapping[msg.sender] = _publicKey;
+        PublicKeySet(msg.sender, _publicKey);
+    }
+
+    function getSymmetricKey() public view onlyShortlistedApplicant returns (string) {
+        return symmetricKeyMapping[msg.sender];
+    }
+
+    function getPublicKey(address _entityAddress) public view returns (string) {
+        return publicKeyMapping[_entityAddress];
+    }
+
+    function getOwnPublicKey() public view onlyShortlistedApplicant returns (string) {
+        return publicKeyMapping[msg.sender];
+    }
+    
+    function getApplicantKeys(address _applicantAddress) public view onlyEmployer returns (string, string){
+        return (symmetricKeyMapping[_applicantAddress], publicKeyMapping[_applicantAddress]);
+    }
+
+    function setInterviewLink(address _applicantAddress, string _interviewLink) public onlyEmployer {
+        interviewLinks[_applicantAddress] = _interviewLink;
+        InterviewLinkSet(_applicantAddress, _interviewLink);
+    }
+
+    function setInterviewFeedback(address _applicantAddress, string _interviewFeedback) public onlyEmployer {
+        interviewFeedbacks[_applicantAddress] = _interviewFeedback;
     }
 
     function setPassScore(uint _score) public onlyEmployer {
         passScore = _score;
     }
 
-    function getPassScore() public view onlyShortlistedApplicant returns (uint) {
+    function getPassScore() public view returns (uint) {
         return passScore;
     }
 
     function getQuestionnaireLink() public view onlyShortlistedApplicant returns (string) {
-        return questionnaireLink;
+        return questionnaireLinks[msg.sender];
     }
 
-    function complete(string _completedFormLink, uint _score) public onlyShortlistedApplicant {
+    function getInterviewLink() public view onlyShortlistedApplicant returns (string) {
+        return interviewLinks[msg.sender];
+    }
+
+    function completeQuestionnaire(string _completedFormLink, uint _score) public onlyShortlistedApplicant {
         require(msg.sender != employer);
         require(applicantIndex[msg.sender] == 0);
         if (applicantsWhoHaveAttempted[msg.sender]){
@@ -85,41 +132,40 @@ contract JobActivity {
         Applicant memory newApplicant = Applicant({
             applicantAddress: msg.sender,
             completedFormLink: _completedFormLink,
-            score: _score,
-            feedback: autoFeedback
-
+            score: _score
         });
 
         testedApplicants.push(newApplicant);
         applicantIndex[msg.sender] = testedApplicants.length;
         applicantsWhoHaveAttempted[msg.sender] = true;
+        questionFeedbacks[msg.sender] = autoFeedback;
         AssessmentCompleted(msg.sender, _completedFormLink, _score, autoFeedback);
-}
-    
-    function getApplicantResponse(address applicantAddress) public view onlyEmployer returns (string, uint, string) {
-        require(applicantIndex[applicantAddress] != 0);
+    }
 
-        Applicant storage applicant = testedApplicants[applicantIndex[applicantAddress] - 1];
-        return (applicant.completedFormLink, applicant.score, applicant.feedback);
+    function getApplicantResponse(address _applicantAddress) public view onlyEmployer returns (string, uint, string) {
+        require(applicantIndex[_applicantAddress] != 0);
+
+        Applicant storage applicant = testedApplicants[applicantIndex[_applicantAddress] - 1];
+        return (applicant.completedFormLink, applicant.score, questionFeedbacks[_applicantAddress]);
     }
 
     function getApplicantsCount() public view onlyEmployer returns (uint) {
         return testedApplicants.length;
     }
 
-    function getApplicantAtIndex(uint index) public view onlyEmployer returns (address, string, uint, string) {
-        require(index < testedApplicants.length);
+    function getApplicantAtIndex(uint _index) public view onlyEmployer returns (address, string, uint, string, string) {
+        require(_index < testedApplicants.length);
 
-        Applicant storage applicant = testedApplicants[index];
-        return (applicant.applicantAddress, applicant.completedFormLink, applicant.score, applicant.feedback);
+        Applicant storage applicant = testedApplicants[_index];
+        return (applicant.applicantAddress, applicant.completedFormLink, applicant.score, questionFeedbacks[applicant.applicantAddress], interviewFeedbacks[applicant.applicantAddress]);
     }
 
-    function getFeedback() public view onlyShortlistedApplicant returns (string) {
-        require(applicantIndex[msg.sender] != 0);
+    function getQuestionnaireFeedback() public view onlyShortlistedApplicant returns (string) {
+        return questionFeedbacks[msg.sender];
+    }
 
-        Applicant storage applicant = testedApplicants[applicantIndex[msg.sender] - 1];
-        return applicant.feedback;
+    function getInterviewFeedback() public view onlyShortlistedApplicant returns (string) {
+        return interviewFeedbacks[msg.sender];
     }
 
 }
-
