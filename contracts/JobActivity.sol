@@ -45,7 +45,7 @@ contract JobActivity {
         _;
     }
 
-    function JobActivityv2() public {
+    function JobActivity() public {
         employer = msg.sender;
     }
 
