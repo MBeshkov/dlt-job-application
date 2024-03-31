@@ -1,7 +1,7 @@
 {
-  "name": "lottery",
+  "name": "job-application",
   "version": "1.0.0",
-  "description": "",
+  "description": "PoC for a democratic job application process",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
