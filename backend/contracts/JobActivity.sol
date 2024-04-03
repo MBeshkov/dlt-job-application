@@ -26,7 +26,7 @@ contract JobActivity {
     event InterviewLinkSet(address applicant, string ilink);
     event AssessmentCompleted(address applicant, string link, uint score, string questionFeedback);
     event SymmetricKeySet(address applicant, string key);
-    event PublicKeySet(address applicant, string key);
+    event PublicKeySet(address indexed applicant);
 
     modifier onlyEmployer(){
         require(msg.sender == employer);
@@ -69,9 +69,13 @@ contract JobActivity {
         SymmetricKeySet(_applicantAddress, _symmetricKey);
     }
 
-    function setPublicKey(string _publicKey) public onlyShortlistedApplicant {
-        publicKeyMapping[msg.sender] = _publicKey;
-        PublicKeySet(msg.sender, _publicKey);
+    function setPublicKey() public  {
+        // publicKeyMapping[msg.sender] = _publicKey;
+        PublicKeySet(msg.sender);
+    }
+
+    function updatePublicKey(address _applicant, string _publicKey) public {
+        publicKeyMapping[_applicant] = _publicKey;
     }
 
     function getSymmetricKey() public view onlyShortlistedApplicant returns (string) {

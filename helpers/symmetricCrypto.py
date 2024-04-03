@@ -53,26 +53,26 @@ def decrypt_secret_link(symmetric_key, encrypted_secret_link):
 
 # Simulation
 
-# Employer generates a secret link
-secret_link = input()
-applicant_key = generate_key_pair()
-symmetric_key = generate_sym_key()
+# # Employer generates a secret link
+# secret_link = input()
+# applicant_key = generate_key_pair()
+# symmetric_key = generate_sym_key()
 
-# Employer encrypts the symmetric key with applicant's public key
-encrypted_symmetric_key = encrypt_symmetric_key(applicant_key.publickey(), symmetric_key)
+# # Employer encrypts the symmetric key with applicant's public key
+# encrypted_symmetric_key = encrypt_symmetric_key(applicant_key.publickey(), symmetric_key)
 
-# Employer encrypts the secret link using the symmetric key
-encrypted_secret_link = encrypt_secret_link(symmetric_key, secret_link)
+# # Employer encrypts the secret link using the symmetric key
+# encrypted_secret_link = encrypt_secret_link(symmetric_key, secret_link)
 
-# Applicant decrypts the symmetric key using their private key
-decrypted_symmetric_key = decrypt_symmetric_key(applicant_key, encrypted_symmetric_key)
+# # Applicant decrypts the symmetric key using their private key
+# decrypted_symmetric_key = decrypt_symmetric_key(applicant_key, encrypted_symmetric_key)
 
-# Applicant decrypts the secret link using the decrypted symmetric key
-decrypted_secret_link = decrypt_secret_link(decrypted_symmetric_key, encrypted_secret_link)
+# # Applicant decrypts the secret link using the decrypted symmetric key
+# decrypted_secret_link = decrypt_secret_link(decrypted_symmetric_key, encrypted_secret_link)
 
-print("Encrypted Secret Link:", encrypted_secret_link)
-secret_link = "The original link you input has now been erased from the system!"
-print(secret_link)
-print("Encrypted symmetric key:", encrypted_symmetric_key)
-print("Decrypted symmetric key:", decrypted_symmetric_key)
-print("Decrypted Secret Link:", decrypted_secret_link.decode())
+# print("Encrypted Secret Link:", encrypted_secret_link)
+# secret_link = "The original link you input has now been erased from the system!"
+# print(secret_link)
+# print("Encrypted symmetric key:", encrypted_symmetric_key)
+# print("Decrypted symmetric key:", decrypted_symmetric_key)
+# print("Decrypted Secret Link:", decrypted_secret_link.decode())
