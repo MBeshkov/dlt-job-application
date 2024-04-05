@@ -73,16 +73,16 @@ const Applicant = () => {
                 </div>
             )}
             <p></p>
-            <input type="text" placeholder="Enter private key" value={privateKeyInput} onChange={handlePrivateKeyInputChange} />
-            <input type="text" placeholder="Enter encrypted symmetric key" value={encryptedKeyInput} onChange={handleEncryptedKeyInputChange} />
+            <input type="text" placeholder="Your private key:" value={privateKeyInput} onChange={handlePrivateKeyInputChange} />
+            <input type="text" placeholder="Encrypted symmetric key:" value={encryptedKeyInput} onChange={handleEncryptedKeyInputChange} />
             <button onClick={handlePrivEncrypKeyInputSubmit}>Decrypt Symmetric Key</button>
-            <p>{decryptedKey}</p>
-            <input type="text" placeholder="Enter decrypted symmetric key" value={decryptedKeyInput} onChange={handleDecryptedKeyInputChange} />
-            <input type="text" placeholder="Enter ciphertext" value={encryptedMessageInput} onChange={handleEncryptedMessageInput} />
-            <input type="text" placeholder="Enter tag" value={tagInput} onChange={handleTagInputChange} />
-            <input type="text" placeholder="Enter nonce" value={nonceInput} onChange={handleNonceInputChange} />
+            <p>Decrypted key: {decryptedKey}</p>
+            <input type="text" placeholder="Decrypted symmetric key:" value={decryptedKeyInput} onChange={handleDecryptedKeyInputChange} />
+            <input type="text" placeholder="Ciphertext:" value={encryptedMessageInput} onChange={handleEncryptedMessageInput} />
+            <input type="text" placeholder="Tag:" value={tagInput} onChange={handleTagInputChange} />
+            <input type="text" placeholder="Nonce:" value={nonceInput} onChange={handleNonceInputChange} />
             <button onClick={handleCipherDecKeyNonceTagInputSubmit}>Decrypt Ciphertext</button>
-            <p>{decryptedMessage}</p>
+            <p>Decrypted message: {decryptedMessage}</p>
         </div>
     );
     

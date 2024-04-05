@@ -39,11 +39,11 @@ def generate_summary(current_applicant_address):
     filtered_feedbacks = [feedb for feedb in feedbacks if feedb != current_applicant_feedback]
     comparison_base = ', '.join(filtered_feedbacks)
     
-    prompt = "1. This is my feedback from a prospective employer for my application to a role at their company: " + current_applicant_feedback + "\n 2. What is written next is a collection of the feedback pieces that other applicants received from the same employer about their applications to the same role:" + comparison_base + "\n 3. Please summarise to me what strengths I demonstrated that other applicants did not (if any). Also about areas where other applicants performed better than I did (if any)."
+    prompt = "1. This is my feedback from a prospective employer for my application to a role at their company: " + current_applicant_feedback + "\n 2. What is written next is a collection of the feedback pieces that other applicants received from the same employer about their applications to the same role:" + comparison_base + "\n 3. Please summarise to me what strengths I demonstrated that other applicants did not (if any). Also about areas where other applicants performed better than I did (if any). Under no circumstance are you to mention other applicants' names or identifiers."
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful HR representative who is supposed to provide comparative feedback to job applicants. Please ensure that you avoid mentioning applicant names or unique identifiers in your response (for example instead of saying \"Applicant 0x583031D1113aD414F02576BD6afaBfb302140225\", say \"another applicant\"). Focus on making a comparison between the user requesting the prompt and other applicants, both in regards to strengths and weaknesses."},
+            {"role": "system", "content": "You are a helpful HR representative who is supposed to provide comparative feedback to job applicants. Please prioritise that you avoid mentioning applicant names or unique names or identifiers in your response (for example never say \"Applicant 0x583031D1113aD414F02576BD6afaBfb302140225\", always say \"another applicant\"). Focus on making a comparison between the user requesting the prompt and other applicants, both in regards to strengths and weaknesses."},
             {"role": "user", "content": prompt}
         ]
     )

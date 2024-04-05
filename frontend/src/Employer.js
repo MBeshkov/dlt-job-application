@@ -67,12 +67,12 @@ const Employer = () => {
             <h1>Employer Page</h1>
             <button onClick={generateSymmetricKey}>Generate Symmetric Key</button>
             <p>{symmetricKey}</p>
-            <input type="text" placeholder="Enter public key" value={publicKeyInput} onChange={handlePublicKeyInputChange} />
-            <input type="text" placeholder="Enter symmetric key" value={symmetricKeyToBeEncryptedInput} onChange={handleSymmetricKeyInputChange} />
+            <input type="text" placeholder="Your public key:" value={publicKeyInput} onChange={handlePublicKeyInputChange} />
+            <input type="text" placeholder="Symmetric key:" value={symmetricKeyToBeEncryptedInput} onChange={handleSymmetricKeyInputChange} />
             <button onClick={handlePubSymKeyInputSubmit}>Submit</button>
             <p>{encryptedKey}</p>
-            <input type="text" placeholder="Enter message" value={messageInput} onChange={handleMessageInputChange} />
-            <input type="text" placeholder="Enter symmetric key" value={symmetricKeyToEncryptWithInput} onChange={handleSymmetricKeyToEncryptWithInputChange} />
+            <input type="text" placeholder="Message:" value={messageInput} onChange={handleMessageInputChange} />
+            <input type="text" placeholder="Symmetric key:" value={symmetricKeyToEncryptWithInput} onChange={handleSymmetricKeyToEncryptWithInputChange} />
             <button onClick={handleMessageSymKeyInputSubmit}>Encrypt Message</button>
             {cipherDetails && typeof cipherDetails === 'object' && (
                 <div>

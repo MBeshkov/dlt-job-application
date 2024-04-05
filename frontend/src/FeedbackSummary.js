@@ -14,6 +14,7 @@ const FeedbackSummary = () => {
         // Replace with your server API endpoint
         axios.post('http://localhost:5000/api/feedbackGenerator', { applicantId })
             .then(res => {
+                console.log(res.data)
                 setSummary(res.data);
             })
             .catch(err => console.error(err));
@@ -32,7 +33,7 @@ const FeedbackSummary = () => {
             {summary && (
                 <div>
                     <h2>Summary:</h2>
-                    <p>{summary}</p>
+                    <p>{summary.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br /></React.Fragment>)}</p>
                 </div>
             )}
         </div>
