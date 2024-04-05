@@ -7,7 +7,7 @@ import './App.css'
 
 const Home = () => {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200">
+        <div className="font-sans sm:font-serif md:font-mono lg:font-sans xl:font-serif flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200">
             <h1 className="mb-6 text-3xl font-bold text-gray-900">Off-chain Project Capabilities</h1>
             <Link to="/feedback-summary" className="w-full max-w-xs px-4 py-2 mb-4 text-2xl font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">
                 Comparative Feedback

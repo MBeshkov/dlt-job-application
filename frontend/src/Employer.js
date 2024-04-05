@@ -63,7 +63,7 @@ const Employer = () => {
     };
 
     return (
-        <div>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200">
             <h1>Employer Page</h1>
             <button onClick={generateSymmetricKey}>Generate Symmetric Key</button>
             <p>{symmetricKey}</p>

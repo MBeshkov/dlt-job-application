@@ -63,7 +63,7 @@ const Applicant = () => {
     };
 
     return (
-        <div>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200">
             <h1>Applicant Page</h1>
             <button onClick={generateKeyPair}>Generate RSA Key Pair</button>
             {rsaKeyPair && typeof rsaKeyPair === 'object' && (
