@@ -35,7 +35,7 @@ const Employer = () => {
         const combinedKeys = `${publicKeyInput};${symmetricKeyToBeEncryptedInput}`;
         
         // Send the combined keys to the Flask route
-        axios.post('http://localhost:5000/api/encrypt_key', { keys: combinedKeys })
+        axios.post('http://localhost:5000/backend/encrypt_key', { keys: combinedKeys })
             .then(res => {
                 setEncryptedKey(res.data);
             })
@@ -47,7 +47,7 @@ const Employer = () => {
         const combined = `${messageInput};${symmetricKeyToEncryptWithInput}`;
         
         // Send the combined keys to the Flask route
-        axios.post('http://localhost:5000/api/encrypt_message', { argums: combined })
+        axios.post('http://localhost:5000/backend/encrypt_message', { argums: combined })
             .then(res => {
                 setEncryptedMessage(res.data);
             })
@@ -55,7 +55,7 @@ const Employer = () => {
     };
 
     const generateSymmetricKey = () => {
-        axios.get('http://localhost:5000/api/generate_symmetric_key')
+        axios.get('http://localhost:5000/backend/generate_symmetric_key')
             .then(res => {
                 setSymmetricKey(res.data);
             })

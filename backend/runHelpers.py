@@ -8,13 +8,13 @@ from symmetricCrypto import generate_key_pair, decrypt_aes, decrypt_symmetric_ke
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/api/feedbackGenerator', methods=['POST'])
+@app.route('/backend/feedbackGenerator', methods=['POST'])
 def get_feedback_summary():
     applicant_id = request.json['applicantId']
     summary = generate_summary(applicant_id)
     return jsonify(summary)
 
-@app.route('/api/generate_key_pair', methods=['GET'])
+@app.route('/backend/generate_key_pair', methods=['GET'])
 def generate_key_pair_route():
     key_pair = generate_key_pair()
     return Response(
@@ -23,7 +23,7 @@ def generate_key_pair_route():
         mimetype='application/json'
     )
 
-@app.route('/api/decrypt_key', methods=['POST'])
+@app.route('/backend/decrypt_key', methods=['POST'])
 def decrypt_key_route():
     input_data = request.json  # Assuming data is sent as JSON
     combined_data = input_data.get('keys', '')
@@ -31,7 +31,7 @@ def decrypt_key_route():
     decoded_key = decrypt_symmetric_key(private_key, encrypted_key)
     return jsonify(base64.b64encode(decoded_key).decode('utf-8'))
 
-@app.route('/api/decrypt_message', methods=['POST'])
+@app.route('/backend/decrypt_message', methods=['POST'])
 def decrypt_message_route():
     input_data = request.json  # Assuming data is sent as JSON
     combined_parameters = input_data.get('parameters', '')
@@ -41,12 +41,12 @@ def decrypt_message_route():
     decrypted_message_str = decrypted_message.decode('utf-8')
     return jsonify(decrypted_message_str)
 
-@app.route('/api/generate_symmetric_key', methods=['GET'])
+@app.route('/backend/generate_symmetric_key', methods=['GET'])
 def generate_symmetric_key_route():
     sym_key = generate_sym_key()
     return jsonify(base64.b64encode(sym_key).decode('utf-8'))
 
-@app.route('/api/encrypt_key', methods=['POST'])
+@app.route('/backend/encrypt_key', methods=['POST'])
 def encrypt_key_route():
     input_data = request.json  # Assuming data is sent as JSON
     combined_keys = input_data.get('keys', '')
@@ -59,7 +59,7 @@ def encrypt_key_route():
 
     return jsonify(encrypted_key)
 
-@app.route('/api/encrypt_message', methods=['POST'])
+@app.route('/backend/encrypt_message', methods=['POST'])
 def encrypt_message_route():
     input_data = request.json  # Assuming data is sent as JSON
     combined_data = input_data.get('argums', '')

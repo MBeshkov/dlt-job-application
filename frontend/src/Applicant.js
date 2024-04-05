@@ -13,7 +13,7 @@ const Applicant = () => {
     const [tagInput, setTagInput] = useState('');
 
     const generateKeyPair = () => {
-        axios.get('http://localhost:5000/api/generate_key_pair')
+        axios.get('http://localhost:5000/backend/generate_key_pair')
             .then(res => {
                 setRsaKeyPair(res.data);
             })
@@ -30,7 +30,7 @@ const Applicant = () => {
 
     const handlePrivEncrypKeyInputSubmit = () => {
         const combinedKeys = `${privateKeyInput};${encryptedKeyInput}`;
-        axios.post('http://localhost:5000/api/decrypt_key', { keys: combinedKeys })
+        axios.post('http://localhost:5000/backend/decrypt_key', { keys: combinedKeys })
             .then(res => {
                 setDecryptedKey(res.data);
             })
@@ -55,7 +55,7 @@ const Applicant = () => {
 
     const handleCipherDecKeyNonceTagInputSubmit = () => {
         const combinedParameters = `${decryptedKeyInput};${encryptedMessageInput};${tagInput};${nonceInput}`;
-        axios.post('http://localhost:5000/api/decrypt_message', { parameters: combinedParameters })
+        axios.post('http://localhost:5000/backend/decrypt_message', { parameters: combinedParameters })
             .then(res => {
                 setDecryptedMessage(res.data);
             })

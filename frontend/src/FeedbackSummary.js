@@ -14,8 +14,9 @@ const FeedbackSummary = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
         setLoading(true);
-        axios.post('http://localhost:5000/api/feedbackGenerator', { applicantId })
+        axios.post('http://localhost:5000/backend/feedbackGenerator', { applicantId })
             .then(res => {
+                console.log(res.data)
                 setSummary(res.data);
                 setLoading(false);
             })

@@ -6,13 +6,17 @@ from pymongo.server_api import ServerApi
 
 
 def generate_summary(current_applicant_address):
-
+    returnStatement = ""
     uri = "mongodb+srv://mihailbeshkov6:n7wSFv55BZdYr7wl@dlt-project.pgxwqng.mongodb.net/?retryWrites=true&w=majority&appName=DLT-Project"
 
     # Create a new client and connect to the server
     dbClient = MongoClient(uri, server_api=ServerApi('1'))
     mydb = dbClient["sample-job-posting"]
     mycol = mydb["feedbacks"]
+
+    if not mycol.find_one({"applicant": current_applicant_address}):
+        returnStatement = "Applicant not found"
+        return(returnStatement)
 
     mydoc = mycol.find({},{ "_id": 0})
 
@@ -48,6 +52,9 @@ def generate_summary(current_applicant_address):
         ]
     )
 
-    return(response.choices[0].message.content)
+    returnStatement = response.choices[0].message.content
+    return(returnStatement)
 
-# generate_summary(mycol, "0x4B0897b0513fdC7C541B6d9D7E929C4e5364D2dB")
+# applicant_address = "caca"
+# summary = generate_summary(applicant_address)
+# print(summary)
