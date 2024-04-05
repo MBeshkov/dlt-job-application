@@ -6,7 +6,11 @@ const Applicant = () => {
     const [decryptedKey, setDecryptedKey] = useState('');
     const [decryptedMessage, setDecryptedMessage] = useState('');
     const [encryptedKeyInput, setEncryptedKeyInput] = useState('');
+    const [privateKeyInput, setPrivateKeyInput] = useState('');
     const [encryptedMessageInput, setEncryptedMessageInput] = useState('');
+    const [decryptedKeyInput, setDecryptedKeyInput] = useState('');
+    const [nonceInput, setNonceInput] = useState('');
+    const [tagInput, setTagInput] = useState('');
 
     const generateKeyPair = () => {
         axios.get('http://localhost:5000/api/generate_key_pair')
@@ -16,16 +20,42 @@ const Applicant = () => {
             .catch(err => console.error(err));
     };
 
-    const decryptKey = () => {
-        axios.post('http://localhost:5000/api/decrypt_key', { encryptedKey: encryptedKeyInput })
+    const handlePrivateKeyInputChange = (e) => {
+        setPrivateKeyInput(e.target.value);
+    };
+
+    const handleEncryptedKeyInputChange = (e) => {
+        setEncryptedKeyInput(e.target.value);
+    };
+
+    const handlePrivEncrypKeyInputSubmit = () => {
+        const combinedKeys = `${privateKeyInput};${encryptedKeyInput}`;
+        axios.post('http://localhost:5000/api/decrypt_key', { keys: combinedKeys })
             .then(res => {
                 setDecryptedKey(res.data);
             })
             .catch(err => console.error(err));
     };
 
-    const decryptMessage = () => {
-        axios.post('http://localhost:5000/api/decrypt_message', { encryptedMessage: encryptedMessageInput })
+    const handleEncryptedMessageInput = (e) => {
+        setEncryptedMessageInput(e.target.value);
+    };
+
+    const handleDecryptedKeyInputChange = (e) => {
+        setDecryptedKeyInput(e.target.value);
+    };
+    
+    const handleNonceInputChange = (e) => {
+        setNonceInput(e.target.value);
+    };
+
+    const handleTagInputChange = (e) => {
+        setTagInput(e.target.value);
+    };
+
+    const handleCipherDecKeyNonceTagInputSubmit = () => {
+        const combinedParameters = `${decryptedKeyInput};${encryptedMessageInput};${tagInput};${nonceInput}`;
+        axios.post('http://localhost:5000/api/decrypt_message', { parameters: combinedParameters })
             .then(res => {
                 setDecryptedMessage(res.data);
             })
@@ -43,11 +73,15 @@ const Applicant = () => {
                 </div>
             )}
             <p></p>
-            <input type="text" placeholder="Enter encrypted key" value={encryptedKeyInput} onChange={(e) => setEncryptedKeyInput(e.target.value)} />
-            <button onClick={decryptKey}>Decrypt Key</button>
+            <input type="text" placeholder="Enter private key" value={privateKeyInput} onChange={handlePrivateKeyInputChange} />
+            <input type="text" placeholder="Enter encrypted symmetric key" value={encryptedKeyInput} onChange={handleEncryptedKeyInputChange} />
+            <button onClick={handlePrivEncrypKeyInputSubmit}>Decrypt Symmetric Key</button>
             <p>{decryptedKey}</p>
-            <input type="text" placeholder="Enter encrypted message" value={encryptedMessageInput} onChange={(e) => setEncryptedMessageInput(e.target.value)} />
-            <button onClick={decryptMessage}>Decrypt Message</button>
+            <input type="text" placeholder="Enter decrypted symmetric key" value={decryptedKeyInput} onChange={handleDecryptedKeyInputChange} />
+            <input type="text" placeholder="Enter ciphertext" value={encryptedMessageInput} onChange={handleEncryptedMessageInput} />
+            <input type="text" placeholder="Enter tag" value={tagInput} onChange={handleTagInputChange} />
+            <input type="text" placeholder="Enter nonce" value={nonceInput} onChange={handleNonceInputChange} />
+            <button onClick={handleCipherDecKeyNonceTagInputSubmit}>Decrypt Ciphertext</button>
             <p>{decryptedMessage}</p>
         </div>
     );

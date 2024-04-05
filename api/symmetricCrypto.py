@@ -37,7 +37,7 @@ def encrypt_rsa(public_key_obj, message):
     cipher_rsa = PKCS1_OAEP.new(public_key_obj)
     result = cipher_rsa.encrypt(message_bytes)
     decoded_data = base64.b64encode(result).decode('utf-8')
-    print(decoded_data)
+    # print(decoded_data)
     return(decoded_data)
 
 # Funciton to generate a symmetric key for AES encryption
@@ -61,7 +61,7 @@ def encrypt_aes(symmetric_key, plaintext):
     }
 
 # Function to decrypt using AES symmetric key
-def decrypt_aes(symmetric_key, ciphertext, nonce, tag):
+def decrypt_aes(symmetric_key, ciphertext, tag, nonce):
     cipher_aes = AES.new(symmetric_key, AES.MODE_EAX, nonce=nonce)
     plaintext = cipher_aes.decrypt(ciphertext)
     try:
@@ -103,16 +103,24 @@ def encrypt_symmetric_key(public_key, symmetric_key):
 
     return encrypt_rsa(public_key_obj, symmetric_key)
 
-
 # Employer encrypts the secret link using the symmetric key
 def encrypt_secret_link(symmetric_key, secret_link):
     return encrypt_aes(symmetric_key, secret_link)
 
 # Applicant decrypts the symmetric key using their private key
 def decrypt_symmetric_key(private_key, encrypted_symmetric_key):
-    cipher_rsa = PKCS1_OAEP.new(private_key)
-    return cipher_rsa.decrypt(encrypted_symmetric_key)
+    private_key = private_key.strip()  # Ensure no leading/trailing whitespace
+    proper_priv_key = "-----BEGIN RSA PRIVATE KEY-----\n" + private_key + "\n-----END RSA PRIVATE KEY-----"
+    private_key_obj = RSA.import_key(proper_priv_key)
+    # symmetric_key = encrypted_symmetric_key.strip()
+    symmetric_key = base64.b64decode(encrypted_symmetric_key)
+    cipher_rsa = PKCS1_OAEP.new(private_key_obj)
+    return cipher_rsa.decrypt(symmetric_key)
 
 # Applicant decrypts the secret link using the decrypted symmetric key
-def decrypt_secret_link(symmetric_key, encrypted_secret_link):
-    return decrypt_aes(symmetric_key, *encrypted_secret_link)
+def decrypt_secret_link(symmetric_key, encrypted_secret_text, tag, nonce):
+    symmetric_key = base64.b64decode(symmetric_key)
+    # encrypted_secret_text = encrypted_secret_text.encode('utf-8')
+    tag = base64.b64decode(tag)
+    nonce = base64.b64decode(nonce)
+    return decrypt_aes(symmetric_key, encrypted_secret_text, tag, nonce)

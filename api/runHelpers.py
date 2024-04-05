@@ -25,13 +25,21 @@ def generate_key_pair_route():
 
 @app.route('/api/decrypt_key', methods=['POST'])
 def decrypt_key_route():
-    encrypted_key = request.json['encryptedKey']
-    return jsonify(decrypt_symmetric_key(encrypted_key))
+    input_data = request.json  # Assuming data is sent as JSON
+    combined_data = input_data.get('keys', '')
+    private_key, encrypted_key = combined_data.split(';')
+    decoded_key = decrypt_symmetric_key(private_key, encrypted_key)
+    return jsonify(base64.b64encode(decoded_key).decode('utf-8'))
 
 @app.route('/api/decrypt_message', methods=['POST'])
 def decrypt_message_route():
-    encrypted_message = request.json['encryptedMessage']
-    return jsonify(decrypt_secret_link(encrypted_message))
+    input_data = request.json  # Assuming data is sent as JSON
+    combined_parameters = input_data.get('parameters', '')
+    symmetric_key, ciphertext, tag, nonce = combined_parameters.split(";")
+    ciphertext = base64.b64decode(ciphertext)
+    decrypted_message = decrypt_secret_link(symmetric_key, ciphertext, tag, nonce)
+    decrypted_message_str = decrypted_message.decode('utf-8')
+    return jsonify(decrypted_message_str)
 
 @app.route('/api/generate_symmetric_key', methods=['GET'])
 def generate_symmetric_key_route():
