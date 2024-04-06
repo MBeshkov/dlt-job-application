@@ -1,9 +1,6 @@
-
 from g4f.client import Client
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-
-
 
 def generate_summary(current_applicant_address):
     returnStatement = ""
@@ -54,7 +51,3 @@ def generate_summary(current_applicant_address):
 
     returnStatement = response.choices[0].message.content
     return(returnStatement)
-
-# applicant_address = "caca"
-# summary = generate_summary(applicant_address)
-# print(summary)
