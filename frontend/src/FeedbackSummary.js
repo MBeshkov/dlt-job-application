@@ -34,9 +34,9 @@ const FeedbackSummary = () => {
                 <Link to="/applicant">Applicant</Link>
             </div>
             <div className="pt-16">
-                <h1 className="mb-6 text-3xl font-bold flex flex-col items-center justify-center text-gray-900">How did I do compared to others?</h1>
+                <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8">How did I do compared to others?</h1>
                 <form onSubmit={handleSubmit}>
-                    <div>
+                    <div className="w-200">
                         <div className = "py-3 flex flex-col items-center justify-center">
                             <input type="text" placeholder="Applicant ID" value={applicantId} onChange={handleChange} className='flex flex-col items-center justify-center rounded' />
                         </div>
