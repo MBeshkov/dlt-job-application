@@ -47,11 +47,13 @@ const FeedbackSummary = () => {
                 </form>
                 {loading && <p className="animate-bounce flex flex-col items-center justify-center">Loading...</p>} {/* Add a spinning animation to the loading message */}
                 {summary && (
-                    <div style={{border: '1px solid black', padding: '10px', textAlign: 'center', maxWidth: '50%', margin: '0 auto'}}> {/* Add a border, center the text, and reduce the width */}
+                    <div style={{border: '1px solid black', padding: '10px', textAlign: 'center', maxWidth: '50%', margin: '0 auto', overflowWrap: 'break-word', wordBreak: 'break-word'}}>
                         <h1 className="text-3xl pb-2">Summary:</h1>
                         <p className="text-xl">{summary.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br /></React.Fragment>)}</p>
                     </div>
                 )}
+                <div className='m-8'>
+                </div>
             </div>
         </div>
     );
