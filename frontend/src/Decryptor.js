@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const Applicant = () => {
+const Decryptor = () => {
     const [rsaKeyPair, setRsaKeyPair] = useState('');
     const [decryptedKey, setDecryptedKey] = useState('');
     const [decryptedMessage, setDecryptedMessage] = useState('');
@@ -71,7 +71,7 @@ const Applicant = () => {
         <div className="font-sans sm:font-serif md:font-mono lg:font-sans xl:font-serif flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200">
             <div className="w-full p-4 bg-white rounded shadow mb-6 fixed top-0 flex items-center justify-center">
                 <Link to="/" className="mr-4">Home</Link>
-                <Link to="/employer" className="mr-4">Employer</Link>
+                <Link to="/encryptor" className="mr-4">Encryptor</Link>
                 <Link to="/feedback-summary" className="mr-4">Feedback</Link>
             </div>
             <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8 mt-16">Applicant Page</h1>
@@ -170,4 +170,4 @@ const Applicant = () => {
     
 };
 
-export default Applicant;
+export default Decryptor;

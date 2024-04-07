@@ -14,7 +14,6 @@ contract JobActivity {
     mapping(address => string) private publicKeyMapping;     // Mapping to store public keys
     mapping(address => string) private questionFeedbacks;    // Mapping for questionnaire feedbacks
     mapping(address => string) private interviewFeedbacks;   // Mapping for interview feedbacks
-    mapping(address => string) private symmetricKeyMapping;   // Mapping for interview feedbacks
     Applicant[] private testedApplicants;
     mapping (address => bool) private applicantsWhoHaveAttempted;
     mapping(address => uint) private applicantIndex;
@@ -25,8 +24,7 @@ contract JobActivity {
     event QuestionnaireLinkSet(address applicant, string qlink);
     event InterviewLinkSet(address applicant, string ilink);
     event AssessmentCompleted(address applicant, string link, uint score, string questionFeedback);
-    event SymmetricKeySet(address applicant, string key);
-    event PublicKeySet(address indexed applicant);
+    event PublicKeySet(address applicant, string key);
 
     modifier onlyEmployer(){
         require(msg.sender == employer);
@@ -64,22 +62,9 @@ contract JobActivity {
         QuestionnaireLinkSet(_applicantAddress, _questionnaireLink);
     }
 
-    function setSymmetricKey(address _applicantAddress, string _symmetricKey) public onlyEmployer {
-        symmetricKeyMapping[_applicantAddress] = _symmetricKey;
-        SymmetricKeySet(_applicantAddress, _symmetricKey);
-    }
-
-    function setPublicKey() public  {
-        // publicKeyMapping[msg.sender] = _publicKey;
-        PublicKeySet(msg.sender);
-    }
-
-    function updatePublicKey(address _applicant, string _publicKey) public {
-        publicKeyMapping[_applicant] = _publicKey;
-    }
-
-    function getSymmetricKey() public view onlyShortlistedApplicant returns (string) {
-        return symmetricKeyMapping[msg.sender];
+    function setPublicKey(string _publicKey) public onlyShortlistedApplicant {
+        publicKeyMapping[msg.sender] = _publicKey;
+        PublicKeySet(msg.sender, _publicKey);
     }
 
     function getPublicKey(address _entityAddress) public view returns (string) {
@@ -88,10 +73,6 @@ contract JobActivity {
 
     function getOwnPublicKey() public view onlyShortlistedApplicant returns (string) {
         return publicKeyMapping[msg.sender];
-    }
-    
-    function getApplicantKeys(address _applicantAddress) public view onlyEmployer returns (string, string){
-        return (symmetricKeyMapping[_applicantAddress], publicKeyMapping[_applicantAddress]);
     }
 
     function setInterviewLink(address _applicantAddress, string _interviewLink) public onlyEmployer {

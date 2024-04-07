@@ -30,8 +30,8 @@ const FeedbackSummary = () => {
         <div className="font-sans sm:font-serif md:font-mono lg:font-sans xl:font-serif flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-200 via-blue-200 to-purple-200">
             <div className="w-full p-4 bg-white rounded shadow mb-6 fixed top-0 flex items-center justify-center">
                 <Link to="/" className="mr-4">Home</Link>
-                <Link to="/employer" className="mr-4">Employer</Link>
-                <Link to="/applicant">Applicant</Link>
+                <Link to="/decryptor" className="mr-4">Decryptor</Link>
+                <Link to="/encryptor">Encryptor</Link>
             </div>
             <div className="pt-16">
                 <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8">How did I do compared to others?</h1>

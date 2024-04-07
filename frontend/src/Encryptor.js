@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const Employer = () => {
+const Encryptor = () => {
     const [symmetricKey, setSymmetricKey] = useState('');
     const [encryptedKey, setEncryptedKey] = useState('');
     const [cipherDetails, setEncryptedMessage] = useState('');
@@ -68,7 +68,7 @@ const Employer = () => {
             <div className="w-full p-4 bg-white rounded shadow mb-6 fixed top-0 flex items-center justify-center">
                 <Link to="/" className="mr-4">Home</Link>
                 <Link to="/feedback-summary" className="mr-4">Feedback</Link>
-                <Link to="/applicant" className="mr-4">Applicant</Link>
+                <Link to="/decryptor" className="mr-4">Decryptor</Link>
             </div>
             <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8 mt-16">Employer Page</h1>
             
@@ -163,4 +163,4 @@ const Employer = () => {
     );
 };
 
-export default Employer;
+export default Encryptor;

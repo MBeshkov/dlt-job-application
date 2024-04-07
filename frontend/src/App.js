@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import FeedbackSummary from './FeedbackSummary';
-import Applicant from './Applicant';
-import Employer from './Employer';
+import Decryptor from './Decryptor';
+import Encryptor from './Encryptor';
 import './App.css'
 
 const Home = () => {
@@ -12,11 +12,11 @@ const Home = () => {
             <Link to="/feedback-summary" className="w-full max-w-xs px-4 py-2 mb-4 text-2xl font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">
                 Comparative Feedback
             </Link>
-            <Link to="/applicant" className="w-full max-w-xs px-4 py-2 mb-4 text-2xl font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">
-                Applicant Crypto
+            <Link to="/decryptor" className="w-full max-w-xs px-4 py-2 mb-4 text-2xl font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">
+                Decryptor Page
             </Link>
-            <Link to="/employer" className="w-full max-w-xs px-4 py-2 text-2xl font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">
-                Employer Crypto
+            <Link to="/encryptor" className="w-full max-w-xs px-4 py-2 text-2xl font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">
+                Encryptor Page
             </Link>
         </div>
     );
@@ -28,8 +28,8 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="feedback-summary" element={<FeedbackSummary />} />
-                <Route path="/applicant" element={<Applicant />} />
-                <Route path="/employer" element={<Employer />} />
+                <Route path="/decryptor" element={<Decryptor />} />
+                <Route path="/encryptor" element={<Encryptor />} />
             </Routes>
         </Router>
     );
