@@ -74,7 +74,7 @@ const Decryptor = () => {
                 <Link to="/encryptor" className="mr-4">Encryptor</Link>
                 <Link to="/feedback-summary" className="mr-4">Feedback</Link>
             </div>
-            <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8 mt-16">Applicant Page</h1>
+            <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8 mt-16">Decryptor Page</h1>
 
             {/* Big device */}
             <div className="hidden sm:flex justify-center space-x-4 mb-4 w-full">

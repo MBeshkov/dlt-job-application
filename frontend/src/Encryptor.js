@@ -70,7 +70,7 @@ const Encryptor = () => {
                 <Link to="/feedback-summary" className="mr-4">Feedback</Link>
                 <Link to="/decryptor" className="mr-4">Decryptor</Link>
             </div>
-            <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8 mt-16">Employer Page</h1>
+            <h1 className="text-3xl font-bold flex flex-col items-center justify-center text-gray-900 p-8 mt-16">Encryptor Page</h1>
             
             {/* Big device */}
             <div className="hidden sm:flex justify-center space-x-4 mb-4 w-full">  
