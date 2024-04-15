@@ -37,18 +37,46 @@ contract JobActivity {
         string tag;
     }
 
+    struct ApplicationFeedback {
+        string secret;
+        string encryptedKey;
+        string nonce;
+        string tag;
+    }
+
+    enum ApplicationStage {
+        Shortlisted,
+        Questionnaire,
+        Interview,
+        UnderConsideration,
+        NoLongerConsidered,
+        Offer,
+        Hired
+    }
+
+    enum MappingType {
+        questionnaireLinks,
+        interviewLinks,
+        interviewFeedbacks,
+        completedQuestionnaires,
+        completedInterviews,
+        applicationFeedbacks
+    }
+
     address public employer;
-    mapping(address => string) private publicKeys; // Mapping to store public keys
-    mapping(address => QuestionnaireLink) private questionnaireLinks; // Individual questionnaire links
+    mapping(address => string) private publicKeys;
+    mapping(address => QuestionnaireLink) private questionnaireLinks;
     mapping(address => QuestionnaireRecord) private completedQuestionnaires;
-    mapping(address => string) private questionnaireFeedbacks; // Mapping for questionnaire feedbacks
-    mapping(address => InterviewLink) private interviewLinks; // Individual interview links
+    mapping(address => string) private questionnaireFeedbacks;
+    mapping(address => InterviewLink) private interviewLinks;
     mapping(address => InterviewRecord) private completedInterviews;
-    mapping(address => InterviewFeedback) private interviewFeedbacks; // Mapping for interview feedbacks
+    mapping(address => InterviewFeedback) private interviewFeedbacks;
+    mapping(address => ApplicationFeedback) private applicationFeedbacks;
     mapping(address => bool) private applicantsWhoHaveAttemptedQuestionnaire;
     mapping(address => bool) private applicantsWhoHaveAttemptedInterview;
     mapping(address => uint256) private applicantIndexQuestionnaire;
     mapping(address => uint256) private applicantIndexInterview;
+    mapping(address => ApplicationStage) private applicantStages;
     address[] private shortlistedApplicants;
     address[] private testedApplicants;
     address[] private interviewedApplicants;
@@ -67,7 +95,10 @@ contract JobActivity {
                 break;
             }
         }
-        require(isShortlisted, "Only shortlisted applicant can call this function");
+        require(
+            isShortlisted,
+            "Only shortlisted applicant can call this function"
+        );
         _;
     }
 
@@ -79,7 +110,10 @@ contract JobActivity {
                 break;
             }
         }
-        require(isShortlisted || msg.sender == employer, "Only shortlisted applicant or employer can call this function");
+        require(
+            isShortlisted || msg.sender == employer,
+            "Only shortlisted applicant or employer can call this function"
+        );
         _;
     }
 
@@ -93,38 +127,45 @@ contract JobActivity {
         string memory _encryptedKey,
         string memory _nonce,
         string memory _tag,
-        string memory _mappingName
+        uint256 _mappingType
     ) private onlyShortlistedApplicantOrEmployer {
-        if (keccak256(bytes(_mappingName)) == keccak256(bytes("questionnaireLinks"))) {
+        if (_mappingType == 0) {
             questionnaireLinks[_applicantAddress] = QuestionnaireLink(
                 _secret,
                 _encryptedKey,
                 _nonce,
                 _tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("interviewLinks"))) {
+        } else if (_mappingType == 1) {
             interviewLinks[_applicantAddress] = InterviewLink(
                 _secret,
                 _encryptedKey,
                 _nonce,
                 _tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("interviewFeedbacks"))) {
+        } else if (_mappingType == 2) {
             interviewFeedbacks[_applicantAddress] = InterviewFeedback(
                 _secret,
                 _encryptedKey,
                 _nonce,
                 _tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("completedQuestionnaires"))) {
+        } else if (_mappingType == 3) {
             completedQuestionnaires[_applicantAddress] = QuestionnaireRecord(
                 _secret,
                 _encryptedKey,
                 _nonce,
                 _tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("completedInterviews"))) {
+        } else if (_mappingType == 4) {
             completedInterviews[_applicantAddress] = InterviewRecord(
+                _secret,
+                _encryptedKey,
+                _nonce,
+                _tag
+            );
+        } else if (_mappingType == 5) {
+            applicationFeedbacks[_applicantAddress] = ApplicationFeedback(
                 _secret,
                 _encryptedKey,
                 _nonce,
@@ -135,16 +176,18 @@ contract JobActivity {
         }
     }
 
-    function structGetter(
-        string memory _mappingName,
-        address _address
-    )
+    function structGetter(uint256 _mappingType, address _address)
         private
         view
-        onlyShortlistedApplicant
-        returns (string memory, string memory, string memory, string memory)
+        onlyShortlistedApplicantOrEmployer
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
     {
-        if (keccak256(bytes(_mappingName)) == keccak256(bytes("questionnaireLinks"))) {
+        if (_mappingType == 0) {
             QuestionnaireLink memory questionnaireStruct = questionnaireLinks[
                 _address
             ];
@@ -154,7 +197,7 @@ contract JobActivity {
                 questionnaireStruct.nonce,
                 questionnaireStruct.tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("interviewLinks"))) {
+        } else if (_mappingType == 1) {
             InterviewLink memory interviewStruct = interviewLinks[_address];
             return (
                 interviewStruct.secret,
@@ -162,7 +205,7 @@ contract JobActivity {
                 interviewStruct.nonce,
                 interviewStruct.tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("interviewFeedbacks"))) {
+        } else if (_mappingType == 2) {
             InterviewFeedback memory intFeedbackStruct = interviewFeedbacks[
                 _address
             ];
@@ -172,7 +215,7 @@ contract JobActivity {
                 intFeedbackStruct.nonce,
                 intFeedbackStruct.tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("completedQuestionnaires"))) {
+        } else if (_mappingType == 3) {
             QuestionnaireRecord memory questRecStruct = completedQuestionnaires[
                 _address
             ];
@@ -182,7 +225,7 @@ contract JobActivity {
                 questRecStruct.nonce,
                 questRecStruct.tag
             );
-        } else if (keccak256(bytes(_mappingName)) == keccak256(bytes("completedInterviews"))) {
+        } else if (_mappingType == 4) {
             InterviewRecord memory intRecStruct = completedInterviews[_address];
             return (
                 intRecStruct.secret,
@@ -190,21 +233,59 @@ contract JobActivity {
                 intRecStruct.nonce,
                 intRecStruct.tag
             );
+        } else if (_mappingType == 5) {
+            ApplicationFeedback memory appCompStruct = applicationFeedbacks[
+                _address
+            ];
+            return (
+                appCompStruct.secret,
+                appCompStruct.encryptedKey,
+                appCompStruct.nonce,
+                appCompStruct.tag
+            );
         } else {
             revert("Invalid mapping name");
         }
     }
 
-    function addShortlistedApplicant(
-        address _applicantAddress
-    ) public onlyEmployer {
+    function stageToString(ApplicationStage stage)
+        internal
+        pure
+        returns (string memory)
+    {
+        if (stage == ApplicationStage.Shortlisted) {
+            return "Shortlisted";
+        } else if (stage == ApplicationStage.Questionnaire) {
+            return "Questionnaire";
+        } else if (stage == ApplicationStage.Interview) {
+            return "Interview";
+        } else if (stage == ApplicationStage.UnderConsideration) {
+            return "Under Consideration";
+        } else if (stage == ApplicationStage.NoLongerConsidered) {
+            return "No Longer Considered";
+        } else if (stage == ApplicationStage.Offer) {
+            return "Offer";
+        } else if (stage == ApplicationStage.Hired) {
+            return "Hired";
+        } else {
+            revert("Invalid application stage");
+        }
+    }
+
+    function addShortlistedApplicant(address _applicantAddress)
+        public
+        onlyEmployer
+    {
+        applicantStages[_applicantAddress] = ApplicationStage.Shortlisted;
         shortlistedApplicants.push(_applicantAddress);
     }
 
     function addMultipleShortlistedApplicants(
         address[] memory _applicantAddresses
     ) public onlyEmployer {
-        for (uint i = 0; i < _applicantAddresses.length; i++) {
+        for (uint256 i = 0; i < _applicantAddresses.length; i++) {
+            applicantStages[_applicantAddresses[i]] = ApplicationStage
+                .Shortlisted;
             shortlistedApplicants.push(_applicantAddresses[i]);
         }
     }
@@ -218,13 +299,18 @@ contract JobActivity {
         return shortlistedApplicants;
     }
 
-    function setPublicKey(
-        string memory _publicKey
-    ) public onlyShortlistedApplicantOrEmployer {
+    function setPublicKey(string memory _publicKey)
+        public
+        onlyShortlistedApplicantOrEmployer
+    {
         publicKeys[msg.sender] = _publicKey;
     }
 
-    function getPublicKey(address _entityAddress) public view returns (string memory) {
+    function getPublicKey(address _entityAddress)
+        public
+        view
+        returns (string memory)
+    {
         return publicKeys[_entityAddress];
     }
 
@@ -248,26 +334,40 @@ contract JobActivity {
         string memory _nonce,
         string memory _tag
     ) public onlyEmployer {
-        string memory name = "questionnaireLinks";
+        uint256 mappingType = 0;
         structSetter(
             _applicantAddress,
             _questionnaireLink,
             _encryptedKey,
             _nonce,
             _tag,
-            name
+            mappingType
         );
+        applicantStages[_applicantAddress] = ApplicationStage.Questionnaire;
+    }
+
+    function setPassScore(uint256 _score) public onlyEmployer {
+        passScore = _score;
+    }
+
+    function getPassScore() public view returns (uint256) {
+        return passScore;
     }
 
     function getQuestionnaireLink()
         public
         view
         onlyShortlistedApplicant
-        returns (string memory, string memory, string memory, string memory)
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
     {
-        string memory name = "questionnaireLinks";
+        uint256 mappingType = 0;
         address _address = msg.sender;
-        return structGetter(name, _address);
+        return structGetter(mappingType, _address);
     }
 
     function completeQuestionnaire(
@@ -278,8 +378,14 @@ contract JobActivity {
         uint256 _score
     ) public onlyShortlistedApplicant {
         address applicant = msg.sender;
-        require(msg.sender != employer, "Employer cannot complete questionnaire");
-        require(applicantIndexQuestionnaire[msg.sender] == 0, "Questionnaire already completed");
+        require(
+            msg.sender != employer,
+            "Employer cannot complete questionnaire"
+        );
+        require(
+            applicantIndexQuestionnaire[msg.sender] == 0,
+            "Questionnaire already completed"
+        );
 
         if (applicantsWhoHaveAttemptedQuestionnaire[msg.sender]) {
             revert("Questionnaire already attempted");
@@ -296,14 +402,14 @@ contract JobActivity {
         applicantsWhoHaveAttemptedQuestionnaire[applicant] = true;
         questionnaireFeedbacks[applicant] = autoFeedback;
 
-        string memory name = "completedQuestionnaires";
+        uint256 mappingType = 3;
         structSetter(
             applicant,
             _completedFormLink,
             _encryptedKey,
             _nonce,
             _tag,
-            name
+            mappingType
         );
     }
 
@@ -323,26 +429,37 @@ contract JobActivity {
         string memory _nonce,
         string memory _tag
     ) public onlyEmployer {
-        string memory name = "interviewLinks";
+        require(
+            applicantStages[_applicantAddress] ==
+                ApplicationStage.Questionnaire,
+            "Applicant must be in questionnaire stage"
+        );
+        uint256 mappingType = 1;
         structSetter(
             _applicantAddress,
             _interviewLink,
             _encryptedKey,
             _nonce,
             _tag,
-            name
+            mappingType
         );
+        applicantStages[_applicantAddress] = ApplicationStage.Interview;
     }
 
     function getInterviewLink()
         public
         view
         onlyShortlistedApplicant
-        returns (string memory, string memory, string memory, string memory)
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
     {
-        string memory name = "interviewLinks";
+        uint256 mappingType = 1;
         address _address = msg.sender;
-        return structGetter(name, _address);
+        return structGetter(mappingType, _address);
     }
 
     function setInterviewRecord(
@@ -352,14 +469,18 @@ contract JobActivity {
         string memory _nonce,
         string memory _tag
     ) public onlyEmployer {
-        string memory name = "completedInterviews";
+        require(
+            applicantStages[_applicantAddress] == ApplicationStage.Interview,
+            "Applicant must be in interview stage"
+        );
+        uint256 mappingType = 4;
         structSetter(
             _applicantAddress,
             _recordLink,
             _encryptedKey,
             _nonce,
             _tag,
-            name
+            mappingType
         );
         applicantsWhoHaveAttemptedInterview[_applicantAddress] = true;
         interviewedApplicants.push(_applicantAddress);
@@ -371,11 +492,16 @@ contract JobActivity {
         public
         view
         onlyShortlistedApplicant
-        returns (string memory, string memory, string memory, string memory)
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
     {
-        string memory name = "completedInterviews";
+        uint256 mappingType = 4;
         address _address = msg.sender;
-        return structGetter(name, _address);
+        return structGetter(mappingType, _address);
     }
 
     function setInterviewFeedback(
@@ -385,54 +511,151 @@ contract JobActivity {
         string memory _nonce,
         string memory _tag
     ) public onlyEmployer {
-        string memory name = "interviewFeedbacks";
+        require(
+            applicantStages[_applicantAddress] == ApplicationStage.Interview,
+            "Applicant must be in interview stage"
+        );
+        uint256 mappingType = 2;
         structSetter(
             _applicantAddress,
             _feedback,
             _encryptedKey,
             _nonce,
             _tag,
-            name
+            mappingType
         );
+        applicantStages[_applicantAddress] = ApplicationStage
+            .UnderConsideration;
     }
 
     function getInterviewFeedback()
         public
         view
         onlyShortlistedApplicant
-        returns (string memory, string memory, string memory, string memory)
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
     {
-        string memory name = "interviewFeedbacks";
+        uint256 mappingType = 2;
         address _address = msg.sender;
-        return structGetter(name, _address);
+        return structGetter(mappingType, _address);
     }
 
-    function setPassScore(uint256 _score) public onlyEmployer {
-        passScore = _score;
-    }
-
-    function getPassScore() public view returns (uint256) {
-        return passScore;
-    }
-
-    function getApplicantAtAddress(
-        address _applicantAddress
-    )
-        public
-        view
-        onlyEmployer
-        returns (string memory, string memory, string memory, string memory, string memory)
-    {
-        return (
-            publicKeys[_applicantAddress],
-            questionnaireFeedbacks[_applicantAddress],
-            completedQuestionnaires[_applicantAddress].secret,
-            completedInterviews[_applicantAddress].secret,
-            interviewFeedbacks[_applicantAddress].secret
+    function setApplicationFeedback(
+        address _applicantAddress,
+        ApplicationStage _newStage,
+        string memory _feedback,
+        string memory _encryptedKey,
+        string memory _nonce,
+        string memory _tag
+    ) public onlyEmployer {
+        require(
+            applicantStages[_applicantAddress] != _newStage,
+            "Applicant already in this stage"
+        );
+        if (
+            _newStage == ApplicationStage.NoLongerConsidered ||
+            _newStage == ApplicationStage.Offer
+        ) {
+            applicantStages[_applicantAddress] = _newStage;
+        } else {
+            revert("Invalid application stage transition");
+        }
+        uint256 mappingType = 5;
+        structSetter(
+            _applicantAddress,
+            _feedback,
+            _encryptedKey,
+            _nonce,
+            _tag,
+            mappingType
         );
     }
 
-    function getApplicantsCount() public view onlyEmployer returns (uint256) {
-        return testedApplicants.length + interviewedApplicants.length;
+    function setToHired(
+        address _applicantAddress
+    ) public onlyEmployer{
+        require(
+            applicantStages[_applicantAddress] == ApplicationStage.Offer,
+            "Applicant has not received an offer"
+        );
+        applicantStages[_applicantAddress] = ApplicationStage.Hired;
     }
+
+    function getApplicantStage(address _applicantAddress)
+        public
+        view
+        onlyEmployer
+        returns (string memory)
+    {
+        return stageToString(applicantStages[_applicantAddress]);
+    }
+
+    function getApplicationFeedback()
+        public
+        view
+        onlyShortlistedApplicant
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
+    {
+        uint256 mappingType = 5;
+        address _address = msg.sender;
+        (
+            string memory feedback,
+            string memory key,
+            string memory nonce,
+            string memory tag
+        ) = structGetter(mappingType, _address);
+        return (
+            feedback,
+            key,
+            nonce,
+            tag,
+            stageToString(applicantStages[msg.sender])
+        );
+    }
+
+    function getCurrentStage()
+        public
+        view
+        onlyShortlistedApplicant
+        returns (string memory)
+    {
+        return stageToString(applicantStages[msg.sender]);
+    }
+
+    function getApplicantAtAddress(address _applicantAddress)
+        public
+        view
+        onlyEmployer
+        returns (
+            string memory publickey,
+            string memory stage,
+            QuestionnaireRecord memory questionnaireRecord,
+            InterviewRecord memory interviewRecord,
+            InterviewFeedback memory interviewFeedback,
+            ApplicationFeedback memory applicationFeedback
+        )
+    {
+        return (
+            publicKeys[_applicantAddress],
+            stageToString(applicantStages[_applicantAddress]),
+            completedQuestionnaires[_applicantAddress],
+            completedInterviews[_applicantAddress],
+            interviewFeedbacks[_applicantAddress],
+            applicationFeedbacks[_applicantAddress]
+        );
+    }
+
+    // function getApplicantsCount() public view onlyEmployer returns (uint256) {
+    //     return testedApplicants.length + interviewedApplicants.length;
+    // }
 }
