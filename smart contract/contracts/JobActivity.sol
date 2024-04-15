@@ -158,16 +158,14 @@ contract JobActivity {
         }
     }
 
-    function structGetter(uint256 _mappingType, address _address)
+    function structGetter(
+        uint256 _mappingType,
+        address _address
+    )
         private
         view
         onlyShortlistedApplicantOrEmployer
-        returns (
-            string memory,
-            string memory,
-            string memory,
-            string memory
-        )
+        returns (string memory, string memory, string memory, string memory)
     {
         if (_mappingType == 0) {
             QuestionnaireLink memory questionnaireStruct = questionnaireLinks[
@@ -230,11 +228,9 @@ contract JobActivity {
         }
     }
 
-    function stageToString(ApplicationStage stage)
-        internal
-        pure
-        returns (string memory)
-    {
+    function stageToString(
+        ApplicationStage stage
+    ) internal pure returns (string memory) {
         if (stage == ApplicationStage.Shortlisted) {
             return "Shortlisted";
         } else if (stage == ApplicationStage.Questionnaire) {
@@ -254,10 +250,9 @@ contract JobActivity {
         }
     }
 
-    function addShortlistedApplicant(address _applicantAddress)
-        public
-        onlyEmployer
-    {
+    function addShortlistedApplicant(
+        address _applicantAddress
+    ) public onlyEmployer {
         applicantStages[_applicantAddress] = ApplicationStage.Shortlisted;
         shortlistedApplicants[_applicantAddress] = true;
     }
@@ -272,18 +267,15 @@ contract JobActivity {
         }
     }
 
-    function setPublicKey(string memory _publicKey)
-        public
-        onlyShortlistedApplicantOrEmployer
-    {
+    function setPublicKey(
+        string memory _publicKey
+    ) public onlyShortlistedApplicantOrEmployer {
         publicKeys[msg.sender] = _publicKey;
     }
 
-    function getPublicKey(address _entityAddress)
-        public
-        view
-        returns (string memory publicKey)
-    {
+    function getPublicKey(
+        address _entityAddress
+    ) public view returns (string memory publicKey) {
         return publicKeys[_entityAddress];
     }
 
@@ -553,12 +545,9 @@ contract JobActivity {
         applicantStages[_applicantAddress] = ApplicationStage.Hired;
     }
 
-    function getApplicantStage(address _applicantAddress)
-        public
-        view
-        onlyEmployer
-        returns (string memory stage)
-    {
+    function getApplicantStage(
+        address _applicantAddress
+    ) public view onlyEmployer returns (string memory stage) {
         return stageToString(applicantStages[_applicantAddress]);
     }
 
@@ -600,7 +589,9 @@ contract JobActivity {
         return stageToString(applicantStages[msg.sender]);
     }
 
-    function getApplicantData(address _applicantAddress)
+    function getApplicantData(
+        address _applicantAddress
+    )
         internal
         view
         onlyShortlistedApplicantOrEmployer
@@ -623,7 +614,9 @@ contract JobActivity {
         );
     }
 
-    function getApplicantAtAddress(address _applicantAddress)
+    function getApplicantAtAddress(
+        address _applicantAddress
+    )
         public
         view
         onlyEmployer
