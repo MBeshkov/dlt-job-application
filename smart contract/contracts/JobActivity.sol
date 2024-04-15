@@ -72,14 +72,10 @@ contract JobActivity {
     mapping(address => InterviewRecord) private completedInterviews;
     mapping(address => InterviewFeedback) private interviewFeedbacks;
     mapping(address => ApplicationFeedback) private applicationFeedbacks;
-    mapping(address => bool) private applicantsWhoHaveAttemptedQuestionnaire;
-    mapping(address => bool) private applicantsWhoHaveAttemptedInterview;
-    mapping(address => uint256) private applicantIndexQuestionnaire;
-    mapping(address => uint256) private applicantIndexInterview;
+    mapping(address => bool) private shortlistedApplicants;
+    mapping(address => bool) private testedApplicants;
+    mapping(address => bool) private interviewedApplicants;
     mapping(address => ApplicationStage) private applicantStages;
-    address[] private shortlistedApplicants;
-    address[] private testedApplicants;
-    address[] private interviewedApplicants;
     uint256 private passScore = 0;
 
     modifier onlyEmployer() {
@@ -88,30 +84,16 @@ contract JobActivity {
     }
 
     modifier onlyShortlistedApplicant() {
-        bool isShortlisted = false;
-        for (uint256 i = 0; i < shortlistedApplicants.length; i++) {
-            if (shortlistedApplicants[i] == msg.sender) {
-                isShortlisted = true;
-                break;
-            }
-        }
         require(
-            isShortlisted,
-            "Only shortlisted applicant can call this function"
+            shortlistedApplicants[msg.sender],
+            "Not a shortlisted applicant"
         );
         _;
     }
 
     modifier onlyShortlistedApplicantOrEmployer() {
-        bool isShortlisted = false;
-        for (uint256 i = 0; i < shortlistedApplicants.length; i++) {
-            if (shortlistedApplicants[i] == msg.sender) {
-                isShortlisted = true;
-                break;
-            }
-        }
         require(
-            isShortlisted || msg.sender == employer,
+            shortlistedApplicants[msg.sender] || msg.sender == employer,
             "Only shortlisted applicant or employer can call this function"
         );
         _;
@@ -277,26 +259,17 @@ contract JobActivity {
         onlyEmployer
     {
         applicantStages[_applicantAddress] = ApplicationStage.Shortlisted;
-        shortlistedApplicants.push(_applicantAddress);
+        shortlistedApplicants[_applicantAddress] = true;
     }
 
     function addMultipleShortlistedApplicants(
         address[] memory _applicantAddresses
     ) public onlyEmployer {
         for (uint256 i = 0; i < _applicantAddresses.length; i++) {
+            shortlistedApplicants[_applicantAddresses[i]] = true;
             applicantStages[_applicantAddresses[i]] = ApplicationStage
                 .Shortlisted;
-            shortlistedApplicants.push(_applicantAddresses[i]);
         }
-    }
-
-    function getShortlistedApplicants()
-        public
-        view
-        onlyEmployer
-        returns (address[] memory)
-    {
-        return shortlistedApplicants;
     }
 
     function setPublicKey(string memory _publicKey)
@@ -383,13 +356,9 @@ contract JobActivity {
             "Employer cannot complete questionnaire"
         );
         require(
-            applicantIndexQuestionnaire[msg.sender] == 0,
+            testedApplicants[msg.sender] == false,
             "Questionnaire already completed"
         );
-
-        if (applicantsWhoHaveAttemptedQuestionnaire[msg.sender]) {
-            revert("Questionnaire already attempted");
-        }
         string memory autoFeedback;
         if (_score >= passScore) {
             autoFeedback = "You proceed to the next stage!";
@@ -397,9 +366,7 @@ contract JobActivity {
             autoFeedback = "Unfortunately, we will not be able to proceed you further.";
         }
 
-        testedApplicants.push(applicant);
-        applicantIndexQuestionnaire[applicant] = testedApplicants.length;
-        applicantsWhoHaveAttemptedQuestionnaire[applicant] = true;
+        testedApplicants[applicant] = true;
         questionnaireFeedbacks[applicant] = autoFeedback;
 
         uint256 mappingType = 3;
@@ -473,6 +440,10 @@ contract JobActivity {
             applicantStages[_applicantAddress] == ApplicationStage.Interview,
             "Applicant must be in interview stage"
         );
+        require(
+            interviewedApplicants[_applicantAddress] == false,
+            "Interview record already set"
+        );
         uint256 mappingType = 4;
         structSetter(
             _applicantAddress,
@@ -482,10 +453,7 @@ contract JobActivity {
             _tag,
             mappingType
         );
-        applicantsWhoHaveAttemptedInterview[_applicantAddress] = true;
-        interviewedApplicants.push(_applicantAddress);
-        applicantIndexInterview[_applicantAddress] = interviewedApplicants
-            .length;
+        interviewedApplicants[_applicantAddress] = true;
     }
 
     function getInterviewRecord()
@@ -553,8 +521,9 @@ contract JobActivity {
         string memory _tag
     ) public onlyEmployer {
         require(
-            applicantStages[_applicantAddress] != _newStage,
-            "Applicant already in this stage"
+            applicantStages[_applicantAddress] ==
+                ApplicationStage.UnderConsideration,
+            "Applicant must be under consideration after an interview stage"
         );
         if (
             _newStage == ApplicationStage.NoLongerConsidered ||
@@ -575,9 +544,7 @@ contract JobActivity {
         );
     }
 
-    function setToHired(
-        address _applicantAddress
-    ) public onlyEmployer{
+    function setToHired(address _applicantAddress) public onlyEmployer {
         require(
             applicantStages[_applicantAddress] == ApplicationStage.Offer,
             "Applicant has not received an offer"
@@ -654,8 +621,4 @@ contract JobActivity {
             applicationFeedbacks[_applicantAddress]
         );
     }
-
-    // function getApplicantsCount() public view onlyEmployer returns (uint256) {
-    //     return testedApplicants.length + interviewedApplicants.length;
-    // }
 }
