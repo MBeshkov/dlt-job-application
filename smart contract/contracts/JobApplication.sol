@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-contract JobApplication {
+contract JobActivity {
     struct QuestionnaireLink {
         string secret;
         string encryptedKey;
@@ -77,6 +77,8 @@ contract JobApplication {
     mapping(address => bool) private interviewedApplicants;
     mapping(address => ApplicationStage) private applicantStages;
     uint256 private passScore = 0;
+    string private questionnairePassFeedback;
+    string private questionnaireFailFeedback;
 
     modifier onlyEmployer() {
         require(msg.sender == employer, "Only employer can call this function");
@@ -158,14 +160,16 @@ contract JobApplication {
         }
     }
 
-    function structGetter(
-        uint256 _mappingType,
-        address _address
-    )
+    function structGetter(uint256 _mappingType, address _address)
         private
         view
         onlyShortlistedApplicantOrEmployer
-        returns (string memory, string memory, string memory, string memory)
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            string memory
+        )
     {
         if (_mappingType == 0) {
             QuestionnaireLink memory questionnaireStruct = questionnaireLinks[
@@ -228,9 +232,11 @@ contract JobApplication {
         }
     }
 
-    function stageToString(
-        ApplicationStage stage
-    ) internal pure returns (string memory) {
+    function stageToString(ApplicationStage stage)
+        internal
+        pure
+        returns (string memory)
+    {
         if (stage == ApplicationStage.Shortlisted) {
             return "Shortlisted";
         } else if (stage == ApplicationStage.Questionnaire) {
@@ -250,9 +256,11 @@ contract JobApplication {
         }
     }
 
-    function addShortlistedApplicant(
-        address _applicantAddress
-    ) public onlyEmployer {
+    function addShortlistedApplicant(address _applicantAddress)
+        public
+        onlyEmployer
+    {
+        require(_applicantAddress != msg.sender);
         applicantStages[_applicantAddress] = ApplicationStage.Shortlisted;
         shortlistedApplicants[_applicantAddress] = true;
     }
@@ -261,21 +269,25 @@ contract JobApplication {
         address[] memory _applicantAddresses
     ) public onlyEmployer {
         for (uint256 i = 0; i < _applicantAddresses.length; i++) {
+            require(_applicantAddresses[i] != msg.sender);
             shortlistedApplicants[_applicantAddresses[i]] = true;
             applicantStages[_applicantAddresses[i]] = ApplicationStage
                 .Shortlisted;
         }
     }
 
-    function setPublicKey(
-        string memory _publicKey
-    ) public onlyShortlistedApplicantOrEmployer {
+    function setPublicKey(string memory _publicKey)
+        public
+        onlyShortlistedApplicantOrEmployer
+    {
         publicKeys[msg.sender] = _publicKey;
     }
 
-    function getPublicKey(
-        address _entityAddress
-    ) public view returns (string memory publicKey) {
+    function getPublicKey(address _entityAddress)
+        public
+        view
+        returns (string memory publicKey)
+    {
         return publicKeys[_entityAddress];
     }
 
@@ -320,6 +332,11 @@ contract JobApplication {
         return passScore;
     }
 
+    function setAutomaticFeedbacks(string memory _pass, string memory _fail) public onlyEmployer {
+        questionnairePassFeedback = _pass;
+        questionnaireFailFeedback = _fail;
+    }
+
     function getQuestionnaireLink()
         public
         view
@@ -345,18 +362,15 @@ contract JobApplication {
     ) public onlyShortlistedApplicant {
         address applicant = msg.sender;
         require(
-            msg.sender != employer,
-            "Employer cannot complete questionnaire"
-        );
-        require(
             testedApplicants[msg.sender] == false,
             "Questionnaire already completed"
         );
         string memory autoFeedback;
         if (_score >= passScore) {
-            autoFeedback = "You proceed to the next stage!";
+            autoFeedback = questionnairePassFeedback;
         } else {
-            autoFeedback = "Unfortunately, we will not be able to proceed you further.";
+            autoFeedback = questionnaireFailFeedback;
+            applicantStages[applicant] = ApplicationStage.NoLongerConsidered;
         }
 
         testedApplicants[applicant] = true;
@@ -391,8 +405,7 @@ contract JobApplication {
     ) public onlyEmployer {
         require(
             applicantStages[_applicantAddress] ==
-                ApplicationStage.Questionnaire,
-            "Applicant must be in questionnaire stage"
+                ApplicationStage.Questionnaire
         );
         uint256 mappingType = 1;
         structSetter(
@@ -430,8 +443,7 @@ contract JobApplication {
         string memory _tag
     ) public onlyEmployer {
         require(
-            applicantStages[_applicantAddress] == ApplicationStage.Interview,
-            "Applicant must be in interview stage"
+            applicantStages[_applicantAddress] == ApplicationStage.Interview
         );
         require(
             interviewedApplicants[_applicantAddress] == false,
@@ -473,8 +485,7 @@ contract JobApplication {
         string memory _tag
     ) public onlyEmployer {
         require(
-            applicantStages[_applicantAddress] == ApplicationStage.Interview,
-            "Applicant must be in interview stage"
+            applicantStages[_applicantAddress] == ApplicationStage.Interview
         );
         uint256 mappingType = 2;
         structSetter(
@@ -545,9 +556,12 @@ contract JobApplication {
         applicantStages[_applicantAddress] = ApplicationStage.Hired;
     }
 
-    function getApplicantStage(
-        address _applicantAddress
-    ) public view onlyEmployer returns (string memory stage) {
+    function getApplicantStage(address _applicantAddress)
+        public
+        view
+        onlyEmployer
+        returns (string memory stage)
+    {
         return stageToString(applicantStages[_applicantAddress]);
     }
 
@@ -589,9 +603,7 @@ contract JobApplication {
         return stageToString(applicantStages[msg.sender]);
     }
 
-    function getApplicantData(
-        address _applicantAddress
-    )
+    function getApplicantData(address _applicantAddress)
         internal
         view
         onlyShortlistedApplicantOrEmployer
@@ -614,9 +626,7 @@ contract JobApplication {
         );
     }
 
-    function getApplicantAtAddress(
-        address _applicantAddress
-    )
+    function getApplicantAtAddress(address _applicantAddress)
         public
         view
         onlyEmployer
