@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-contract JobActivity {
+contract JobApplication {
     struct QuestionnaireLink {
         string secret;
         string encryptedKey;
