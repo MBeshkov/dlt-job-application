@@ -79,10 +79,6 @@ def encrypt_symmetric_key(public_key, symmetric_key):
     )
     symmetric_key = symmetric_key.strip()
 
-    # Debugging: Print public key before import
-    print("Public Key Before Import:")
-    print(proper_key)
-
     # Check if the key starts with the expected header
     if not proper_key.startswith("-----BEGIN PUBLIC KEY-----"):
         print("Error: Public key does not start with '-----BEGIN PUBLIC KEY-----'")
@@ -99,10 +95,6 @@ def encrypt_symmetric_key(public_key, symmetric_key):
     except Exception as e:
         print("Error importing public key:", e)
         return None
-
-    # Debugging: Print imported public key
-    print("Imported Public Key:")
-    print(public_key_obj)
 
     return encrypt_rsa(public_key_obj, symmetric_key)
 

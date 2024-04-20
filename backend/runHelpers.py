@@ -5,12 +5,9 @@ import base64
 from comparativeFeedbackGenerator import generate_summary
 from symmetricCrypto import (
     generate_key_pair,
-    decrypt_aes,
     decrypt_symmetric_key,
     decrypt_secret_link,
-    encrypt_rsa,
     generate_sym_key,
-    encrypt_aes,
     encrypt_symmetric_key,
     encrypt_secret_link,
 )
@@ -85,8 +82,6 @@ def encrypt_message_route():
     return Response(
         response=json.dumps(cipher_details), status=200, mimetype="application/json"
     )
-    return jsonify(encrypt_secret_link(symmetric_key, message))
-
 
 if __name__ == "__main__":
     app.run(debug=True)
