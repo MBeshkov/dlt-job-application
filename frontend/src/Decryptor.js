@@ -22,7 +22,7 @@ const Decryptor = () => {
                 setLoading(false);
             })
             .catch(err => console.error(err));
-            setLoading(false);
+        setLoading(false);
     };
 
     const handlePrivateKeyInputChange = (e) => {
@@ -49,7 +49,7 @@ const Decryptor = () => {
     const handleDecryptedKeyInputChange = (e) => {
         setDecryptedKeyInput(e.target.value);
     };
-    
+
     const handleNonceInputChange = (e) => {
         setNonceInput(e.target.value);
     };
@@ -120,54 +120,54 @@ const Decryptor = () => {
                     )}
                 </div>
             </div>
-                {/* Small device */}
-                <div className="sm:hidden flex flex-col justify-center space-y-4 mb-4 w-full">
-                    {/* Left column */}
-                    <div className="w-full flex flex-col items-center justify-center">
-                        <button className="w-full px-2 py-2 mb-4 text-2s font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600" onClick={generateKeyPair}>Generate RSA Key Pair</button>
-                        {loading && <p className="animate-bounce flex flex-col items-center justify-center">Loading...</p>}
-                        {rsaKeyPair && typeof rsaKeyPair === 'object' && (
-                            <div style={{ border: '1px solid black', padding: '10px', maxWidth: '80%', margin: '0 auto', overflowY: 'scroll', maxHeight: '200px' }}>
-                                <p className='text-xl p-2'>Public Key:</p>
-                                <p> {rsaKeyPair.public_key.replace(/-+BEGIN PUBLIC KEY-+\n?|-+END PUBLIC KEY-+\n?/g, '')}</p>
-                                <p className='text-xl p-2'>Private Key:</p>
-                                <p> {rsaKeyPair.private_key.replace(/-+BEGIN RSA PRIVATE KEY-+\n?|-+END RSA PRIVATE KEY-+\n?/g, '')}</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Middle column */}
-                    <div className="w-full flex flex-col items-center justify-center">
-                        <input type="text" placeholder="Your private key:" value={privateKeyInput} onChange={handlePrivateKeyInputChange} className='flex flex-col items-center justify-center rounded m-1' />
-                        <input type="text" placeholder="Encrypted sym key:" value={encryptedKeyInput} onChange={handleEncryptedKeyInputChange} className='flex flex-col items-center justify-center rounded m-1' />
-                        <button onClick={handlePrivEncrypKeyInputSubmit} className="w-full px-2 py-2 text-2s font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">Decrypt Symmetric Key</button>
-                        {decryptedKey && typeof decryptedKey === 'string' && (
-                            <div className="flex flex-col items-center justify-center">
-                                <p className='text-xl p-2'>Decrypted key:</p>
-                                <p>{decryptedKey}</p>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Right column */}
-                    <div className="w-full flex flex-col items-center justify-center">
-                        <input type="text" placeholder="Decrypted sym key:" value={decryptedKeyInput} onChange={handleDecryptedKeyInputChange} className='flex flex-col items-center justify-center rounded m-1' />
-                        <input type="text" placeholder="Ciphertext:" value={encryptedMessageInput} onChange={handleEncryptedMessageInput} className='flex flex-col items-center justify-center rounded m-1' />
-                        <input type="text" placeholder="Tag:" value={tagInput} onChange={handleTagInputChange} className='flex flex-col items-center justify-center rounded m-1' />
-                        <input type="text" placeholder="Nonce:" value={nonceInput} onChange={handleNonceInputChange} className='flex flex-col items-center justify-center rounded m-1' />
-                        <button onClick={handleCipherDecKeyNonceTagInputSubmit} className="w-full px-2 py-2 mb-4 text-2s font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">Decrypt Ciphertext</button>
-                        {decryptedMessage && typeof decryptedMessage === 'string' && (
-                            <div style={{ border: '1px solid black', padding: '10px', maxWidth: '80%', margin: '0 auto', overflowY: 'scroll', maxHeight: '200px', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                                <p className='text-xl p-2'>Decrypted message:</p>
-                                <p>{decryptedMessage}</p>
-                            </div>
-                        )}
-                    </div>
+            {/* Small device */}
+            <div className="sm:hidden flex flex-col justify-center space-y-4 mb-4 w-full">
+                {/* Left column */}
+                <div className="w-full flex flex-col items-center justify-center">
+                    <button className="w-full px-2 py-2 mb-4 text-2s font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600" onClick={generateKeyPair}>Generate RSA Key Pair</button>
+                    {loading && <p className="animate-bounce flex flex-col items-center justify-center">Loading...</p>}
+                    {rsaKeyPair && typeof rsaKeyPair === 'object' && (
+                        <div style={{ border: '1px solid black', padding: '10px', maxWidth: '80%', margin: '0 auto', overflowY: 'scroll', maxHeight: '200px' }}>
+                            <p className='text-xl p-2'>Public Key:</p>
+                            <p> {rsaKeyPair.public_key.replace(/-+BEGIN PUBLIC KEY-+\n?|-+END PUBLIC KEY-+\n?/g, '')}</p>
+                            <p className='text-xl p-2'>Private Key:</p>
+                            <p> {rsaKeyPair.private_key.replace(/-+BEGIN RSA PRIVATE KEY-+\n?|-+END RSA PRIVATE KEY-+\n?/g, '')}</p>
+                        </div>
+                    )}
                 </div>
-            
+
+                {/* Middle column */}
+                <div className="w-full flex flex-col items-center justify-center">
+                    <input type="text" placeholder="Your private key:" value={privateKeyInput} onChange={handlePrivateKeyInputChange} className='flex flex-col items-center justify-center rounded m-1' />
+                    <input type="text" placeholder="Encrypted sym key:" value={encryptedKeyInput} onChange={handleEncryptedKeyInputChange} className='flex flex-col items-center justify-center rounded m-1' />
+                    <button onClick={handlePrivEncrypKeyInputSubmit} className="w-full px-2 py-2 text-2s font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">Decrypt Symmetric Key</button>
+                    {decryptedKey && typeof decryptedKey === 'string' && (
+                        <div className="flex flex-col items-center justify-center">
+                            <p className='text-xl p-2'>Decrypted key:</p>
+                            <p>{decryptedKey}</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Right column */}
+                <div className="w-full flex flex-col items-center justify-center">
+                    <input type="text" placeholder="Decrypted sym key:" value={decryptedKeyInput} onChange={handleDecryptedKeyInputChange} className='flex flex-col items-center justify-center rounded m-1' />
+                    <input type="text" placeholder="Ciphertext:" value={encryptedMessageInput} onChange={handleEncryptedMessageInput} className='flex flex-col items-center justify-center rounded m-1' />
+                    <input type="text" placeholder="Tag:" value={tagInput} onChange={handleTagInputChange} className='flex flex-col items-center justify-center rounded m-1' />
+                    <input type="text" placeholder="Nonce:" value={nonceInput} onChange={handleNonceInputChange} className='flex flex-col items-center justify-center rounded m-1' />
+                    <button onClick={handleCipherDecKeyNonceTagInputSubmit} className="w-full px-2 py-2 mb-4 text-2s font-bold text-center text-white bg-purple-500 rounded hover:bg-purple-600">Decrypt Ciphertext</button>
+                    {decryptedMessage && typeof decryptedMessage === 'string' && (
+                        <div style={{ border: '1px solid black', padding: '10px', maxWidth: '80%', margin: '0 auto', overflowY: 'scroll', maxHeight: '200px', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                            <p className='text-xl p-2'>Decrypted message:</p>
+                            <p>{decryptedMessage}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
         </div>
     );
-    
+
 };
 
 export default Decryptor;

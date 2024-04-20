@@ -107,10 +107,10 @@ const Encryptor = () => {
                         <div style={{ border: '1px solid black', padding: '10px', maxWidth: '80%', margin: '0 auto', overflowY: 'scroll', maxHeight: '200px', overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                             <p className='text-xl p-2'>Encrypted Message:</p> 
                             <p>{cipherDetails.ciphertext}</p>
-                            <p className='text-xl p-2'>Nonce:</p>
-                            <p> {cipherDetails.nonce}</p>
                             <p className='text-xl p-2'>Tag:</p>
                             <p> {cipherDetails.tag}</p>
+                            <p className='text-xl p-2'>Nonce:</p>
+                            <p> {cipherDetails.nonce}</p>
                         </div>
                     )}
                 </div>
