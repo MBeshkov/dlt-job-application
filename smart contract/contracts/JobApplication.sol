@@ -64,18 +64,18 @@ contract JobActivity {
     }
 
     address public employer; 
-    mapping(address => string) private publicKeys;
-    mapping(address => QuestionnaireLink) private questionnaireLinks;
-    mapping(address => QuestionnaireRecord) private completedQuestionnaires;
-    mapping(address => string) private questionnaireFeedbacks;
-    mapping(address => InterviewLink) private interviewLinks;
-    mapping(address => InterviewRecord) private completedInterviews;
-    mapping(address => InterviewFeedback) private interviewFeedbacks;
-    mapping(address => ApplicationFeedback) private applicationFeedbacks;
-    mapping(address => bool) private shortlistedApplicants;
-    mapping(address => bool) private testedApplicants;  // applicants that have done their virtual assessments
-    mapping(address => bool) private interviewedApplicants;
-    mapping(address => ApplicationStage) private applicantStages;
+    mapping(address => string) private publicKeys; // dictionary with all public keys
+    mapping(address => QuestionnaireLink) private questionnaireLinks; // dictionary with all assessment links
+    mapping(address => QuestionnaireRecord) private completedQuestionnaires; // dictionary with all completed assessment links
+    mapping(address => string) private questionnaireFeedbacks; // dictionary with all assessment feedback records
+    mapping(address => InterviewLink) private interviewLinks; // dictionary with all interview links
+    mapping(address => InterviewRecord) private completedInterviews; // dictionary with all interview records
+    mapping(address => InterviewFeedback) private interviewFeedbacks; // dictionary with all interview feedback records
+    mapping(address => ApplicationFeedback) private applicationFeedbacks; // dictionary with all application feedback records
+    mapping(address => bool) private shortlistedApplicants; // dictionary with all shortlisted applicants
+    mapping(address => bool) private testedApplicants;  // dictionary with applicants that have done their virtual assessments
+    mapping(address => bool) private interviewedApplicants; // dictionary with applicants with completed interviews
+    mapping(address => ApplicationStage) private applicantStages;   // dictionary with the progress of each applicant
     uint256 private passScore = 0;  // the minimum threshold for the virtual assessment
     string private questionnairePassFeedback;   // the automatic feedback for those who pass the minimum threshold
     string private questionnaireFailFeedback;   // the automatic feedback for those who do not pass the minimum threshold
