@@ -2,14 +2,14 @@ from g4f.client import Client
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 
-
+# establishes connection to database instance and "navigates" to the specific collection of interest
 def connect_to_db(uri):
     dbClient = MongoClient(uri, server_api=ServerApi("1"))
     mydb = dbClient["sample-job-posting"]
     mycol = mydb["feedbacks"]
     return mycol
 
-
+# acquires the feedback entries in the specified collection
 def get_feedbacks(mycol):
     mydoc = mycol.find({}, {"_id": 0})
     feedbacks = []
@@ -21,7 +21,7 @@ def get_feedbacks(mycol):
             print(e)
     return feedbacks
 
-
+# separates the requesting applicant's feedback from the rest
 def get_applicant_feedback(mycol, current_applicant_address):
     query = {"applicant": current_applicant_address}
     feedback_to_be_considered = mycol.find(query)
@@ -30,7 +30,7 @@ def get_applicant_feedback(mycol, current_applicant_address):
         current_applicant_feedback += x["feedback"]
     return current_applicant_feedback
 
-
+# uses the output of the previous functions to create the instructions for the gpt
 def generate_prompt(current_applicant_feedback, feedbacks):
     filtered_feedbacks = [
         feedb for feedb in feedbacks if feedb != current_applicant_feedback
@@ -45,7 +45,8 @@ def generate_prompt(current_applicant_feedback, feedbacks):
     )
     return prompt
 
-
+""" integrates previous functions to connect to database and if record for the selected applicant exists, generates a prompt,
+connects to a gpt instance and parses its response """
 def generate_summary(current_applicant_address):
     returnStatement = ""
     uri = "mongodb+srv://mihailbeshkov6:n7wSFv55BZdYr7wl@dlt-project.pgxwqng.mongodb.net/?retryWrites=true&w=majority&appName=DLT-Project"

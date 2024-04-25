@@ -1,50 +1,50 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.11;
+pragma solidity ^0.8.11;            // helps the compiler decide what is required
 
 contract JobActivity {
-    struct QuestionnaireLink {
+    struct QuestionnaireLink {      // represents an access link to an online assessment
         string secret;
         string encryptedKey;
         string nonce;
         string tag;
     }
 
-    struct QuestionnaireRecord {
+    struct QuestionnaireRecord {    // represents an access link to a completed assessment
         string secret;
         string encryptedKey;
         string nonce;
         string tag;
     }
 
-    struct InterviewLink {
+    struct InterviewLink {          // represents an access link to an interview invite
         string secret;
         string encryptedKey;
         string nonce;
         string tag;
     }
 
-    struct InterviewRecord {
+    struct InterviewRecord {        // represents a link to evidence of an interview, e.g. a text transcript
         string secret;
         string encryptedKey;
         string nonce;
         string tag;
     }
 
-    struct InterviewFeedback {
+    struct InterviewFeedback {      // represents interview feedback, either the text itself, or a link to it
         string secret;
         string encryptedKey;
         string nonce;
         string tag;
     }
 
-    struct ApplicationFeedback {
+    struct ApplicationFeedback {    // represents application feedback, either the text itself, or a link to it
         string secret;
         string encryptedKey;
         string nonce;
         string tag;
     }
 
-    enum ApplicationStage {
+    enum ApplicationStage {         // the possible stages that an applicant can go through
         Shortlisted,
         Questionnaire,
         Interview,
@@ -54,7 +54,7 @@ contract JobActivity {
         Hired
     }
 
-    enum MappingType {
+    enum MappingType {              // the mapping types containing the record structs defined above
         questionnaireLinks,
         interviewLinks,
         interviewFeedbacks,
@@ -63,7 +63,7 @@ contract JobActivity {
         applicationFeedbacks
     }
 
-    address public employer;
+    address public employer; 
     mapping(address => string) private publicKeys;
     mapping(address => QuestionnaireLink) private questionnaireLinks;
     mapping(address => QuestionnaireRecord) private completedQuestionnaires;
@@ -73,19 +73,19 @@ contract JobActivity {
     mapping(address => InterviewFeedback) private interviewFeedbacks;
     mapping(address => ApplicationFeedback) private applicationFeedbacks;
     mapping(address => bool) private shortlistedApplicants;
-    mapping(address => bool) private testedApplicants;
+    mapping(address => bool) private testedApplicants;  // applicants that have done their virtual assessments
     mapping(address => bool) private interviewedApplicants;
     mapping(address => ApplicationStage) private applicantStages;
-    uint256 private passScore = 0;
-    string private questionnairePassFeedback;
-    string private questionnaireFailFeedback;
+    uint256 private passScore = 0;  // the minimum threshold for the virtual assessment
+    string private questionnairePassFeedback;   // the automatic feedback for those who pass the minimum threshold
+    string private questionnaireFailFeedback;   // the automatic feedback for those who do not pass the minimum threshold
 
-    modifier onlyEmployer() {
+    modifier onlyEmployer() {                       // used to ensure only employer can invoke certain functions
         require(msg.sender == employer, "Only employer can call this function");
         _;
     }
 
-    modifier onlyShortlistedApplicant() {
+    modifier onlyShortlistedApplicant() {           // used to ensure only applicants can invoke certain functions
         require(
             shortlistedApplicants[msg.sender],
             "Not a shortlisted applicant"
@@ -93,7 +93,7 @@ contract JobActivity {
         _;
     }
 
-    modifier onlyShortlistedApplicantOrEmployer() {
+    modifier onlyShortlistedApplicantOrEmployer() { // used to ensure only employer or applicants can invoke vertain functions
         require(
             shortlistedApplicants[msg.sender] || msg.sender == employer,
             "Only shortlisted applicant or employer can call this function"
@@ -101,11 +101,11 @@ contract JobActivity {
         _;
     }
 
-    constructor() {
+    constructor() {             // actions to be executed when contract is deployed
         employer = msg.sender;
     }
 
-    function structSetter(
+    function structSetter(      // helper function that defines the behaviour of struct setter functions 
         address _applicantAddress,
         string memory _secret,
         string memory _encryptedKey,
@@ -160,11 +160,12 @@ contract JobActivity {
         }
     }
 
-    function structGetter(uint256 _mappingType, address _address)
+    // helper function that defines the behaviour of struct getter functions 
+    function structGetter(uint256 _mappingType, address _address) 
         private
         view
         onlyShortlistedApplicantOrEmployer
-        returns (
+        returns ( 
             string memory,
             string memory,
             string memory,
@@ -232,6 +233,7 @@ contract JobActivity {
         }
     }
 
+    // helper function which returns application stages in a readable manner
     function stageToString(ApplicationStage stage)
         internal
         pure
@@ -256,6 +258,7 @@ contract JobActivity {
         }
     }
 
+    // employer enables a job applicant to use the applicant-side functions of the contract
     function addShortlistedApplicant(address _applicantAddress)
         public
         onlyEmployer
@@ -265,6 +268,7 @@ contract JobActivity {
         shortlistedApplicants[_applicantAddress] = true;
     }
 
+    // employer enables multiple job applicants to use the applicant-side functions of the contract
     function addMultipleShortlistedApplicants(
         address[] memory _applicantAddresses
     ) public onlyEmployer {
@@ -276,6 +280,7 @@ contract JobActivity {
         }
     }
 
+    // transact own public key
     function setPublicKey(string memory _publicKey)
         public
         onlyShortlistedApplicantOrEmployer
@@ -283,6 +288,7 @@ contract JobActivity {
         publicKeys[msg.sender] = _publicKey;
     }
 
+    // obtain the public key of a specific actor
     function getPublicKey(address _entityAddress)
         public
         view
@@ -291,6 +297,7 @@ contract JobActivity {
         return publicKeys[_entityAddress];
     }
 
+    // obtain the public key of the employer
     function getEmployerPublicKey()
         public
         view
@@ -300,10 +307,12 @@ contract JobActivity {
         return publicKeys[employer];
     }
 
+    // obtain own public key
     function getOwnPublicKey() public view returns (string memory publicKey) {
         return publicKeys[msg.sender];
     }
 
+    // employer transacts access to a virtual assessment
     function setQuestionnaireLink(
         address _applicantAddress,
         string memory _questionnaireLink,
@@ -324,19 +333,23 @@ contract JobActivity {
         applicantStages[_applicantAddress] = ApplicationStage.Questionnaire;
     }
 
+    // employer determines the score needed to pass the virtual assessment
     function setPassScore(uint256 _score) public onlyEmployer {
         passScore = _score;
     }
 
+    // obtain the score needed to pass the virtual assessment
     function getPassScore() public view returns (uint256 scoreToAchieve) {
         return passScore;
     }
 
+    // employer determines the automatic feedback for those who complete the virtual assessment
     function setAutomaticFeedbacks(string memory _pass, string memory _fail) public onlyEmployer {
         questionnairePassFeedback = _pass;
         questionnaireFailFeedback = _fail;
     }
 
+    // applicant acquires access to the virtual assessment
     function getQuestionnaireLink()
         public
         view
@@ -353,6 +366,7 @@ contract JobActivity {
         return structGetter(mappingType, _address);
     }
 
+    // applicant transacts a record of their completed assessment and their score, generating feedback
     function completeQuestionnaire(
         string memory _completedFormLink,
         string memory _encryptedKey,
@@ -387,6 +401,7 @@ contract JobActivity {
         );
     }
 
+    // applicant acquires feedback for virtual assessment
     function getQuestionnaireFeedback()
         public
         view
@@ -395,7 +410,8 @@ contract JobActivity {
     {
         return questionnaireFeedbacks[msg.sender];
     }
-
+    
+    // employer transacts access to an interview (virtual or not)
     function setInterviewLink(
         address _applicantAddress,
         string memory _interviewLink,
@@ -419,6 +435,7 @@ contract JobActivity {
         applicantStages[_applicantAddress] = ApplicationStage.Interview;
     }
 
+    // applicant acquires access to the interview
     function getInterviewLink()
         public
         view
@@ -435,6 +452,7 @@ contract JobActivity {
         return structGetter(mappingType, _address);
     }
 
+    // employer transacts evidence of conducted interview
     function setInterviewRecord(
         address _applicantAddress,
         string memory _recordLink,
@@ -461,6 +479,7 @@ contract JobActivity {
         interviewedApplicants[_applicantAddress] = true;
     }
 
+    // applicant acquires access to interview evidence
     function getInterviewRecord()
         public
         view
@@ -477,6 +496,7 @@ contract JobActivity {
         return structGetter(mappingType, _address);
     }
 
+    // employer transacts interview feedback (or access to it)
     function setInterviewFeedback(
         address _applicantAddress,
         string memory _feedback,
@@ -500,6 +520,7 @@ contract JobActivity {
             .UnderConsideration;
     }
 
+    // applicant acquires access to interview feedback (or directly the feedback itself)
     function getInterviewFeedback()
         public
         view
@@ -516,6 +537,7 @@ contract JobActivity {
         return structGetter(mappingType, _address);
     }
 
+    // employer transacts application feedback (or access to it); dynamically progresses or rejects a candidate
     function setApplicationFeedback(
         address _applicantAddress,
         ApplicationStage _newStage,
@@ -548,6 +570,7 @@ contract JobActivity {
         );
     }
 
+    // employer changes status of an applicant to hired
     function setToHired(address _applicantAddress) public onlyEmployer {
         require(
             applicantStages[_applicantAddress] == ApplicationStage.Offer,
@@ -556,6 +579,7 @@ contract JobActivity {
         applicantStages[_applicantAddress] = ApplicationStage.Hired;
     }
 
+    // obtain the progression of a candidate
     function getApplicantStage(address _applicantAddress)
         public
         view
@@ -565,6 +589,7 @@ contract JobActivity {
         return stageToString(applicantStages[_applicantAddress]);
     }
 
+    // applicant acquires access to application feedback (or directly the feedback itself)
     function getApplicationFeedback()
         public
         view
@@ -594,6 +619,7 @@ contract JobActivity {
         );
     }
 
+    // applicant verifies current stage
     function getCurrentStage()
         public
         view
@@ -603,6 +629,7 @@ contract JobActivity {
         return stageToString(applicantStages[msg.sender]);
     }
 
+    // helper function for obtaining a summary of the data related to a single applicant
     function getApplicantData(address _applicantAddress)
         internal
         view
@@ -626,6 +653,7 @@ contract JobActivity {
         );
     }
 
+    // employer obtainins a summary of the data related to a single applicant by address
     function getApplicantAtAddress(address _applicantAddress)
         public
         view
@@ -642,6 +670,7 @@ contract JobActivity {
         return getApplicantData(_applicantAddress);
     }
 
+    // applicant obtainins a summary of their own data
     function getMyApplicationData()
         public
         view
