@@ -66,7 +66,7 @@ Now the back-end server should be running and the front-end application should b
 
 A note on the database set-up in `backend/comparativeFeedbackGenerator.py`: Currently, there is a connection made with a test MongoDB database belonging to the author of this project. That database is meant to support a university demonstration and is not meant to be a scalable and durable part of the project. The access details provided in the `uri =` line are purposefully left there until this project is assessed in the University of Aberdeen. After that, this line will be deleted and whomever desires to maintain the code will be required to create their own database and include their own uri in the code. For reference how to structure one's collection, please refer to the figure below. The author also recommends that if further work is pursued in this manner, the sensitive information should instead be stored in the form of environment variables. <br> <br>
 
-![Uploading u21.png…]()
+<img width="762" alt="u21" src="https://github.com/MBeshkov/dlt-job-application/assets/55166408/508a118a-f783-4296-a539-e12bca549fbe">
 
 
 
