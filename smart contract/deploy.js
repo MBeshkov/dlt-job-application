@@ -3,7 +3,7 @@ const { Web3 } = require('web3');
 const { interface, bytecode } = require('./compile');
 
 const provider = new HDWalletProvider(
-  'absurd speak thunder divide scale lecture biology nominee that metal such hamster', 'https://sepolia.infura.io/v3/3fd882e4b4874eeb9cb5bedbc8c32cec'
+  'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12', 'https://sepolia.infura.io/v#/key'
 );
 const web3 = new Web3(provider);
 
